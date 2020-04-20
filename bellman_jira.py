@@ -102,14 +102,12 @@ def get_new_bugs(jira, jira_project, days):
 #<table><tr><td>header1</td><td>header2</td></tr><tr><td>info1</td><td>info2</td></tr><tr><td>info1</td><td>info2</td></tr><tr><td>info1</td><td>info2</td></tr></table>\
 #</messageML>'
 
-def send_message_to_symphony(subject, body):
-    url = 'https://corporate.symphony.com/integration/v1/whi/simpleWebHookIntegration/5810d144e4b0f884b709cc90/5e99bb427a1604320ceb9d70'
-
+def send_message_to_symphony(subject, body, webhook):
     data = '<messageML><b>' + subject + '</b><br/>' + body + '</messageML>'
 
     print('data: ' + data)
 
-    r = requests.post(url, data=data)
+    r = requests.post(webhook, data=data)
 
     print('r: ' + str(r))
     print('r.status_code: ' + str(r.status_code))
@@ -118,13 +116,13 @@ def send_message_to_symphony(subject, body):
 ###
 ###
 ###
-def send(days):
+def send(days, webhook):
     [subject, body_text] = get_new_bugs(jira, 'sda', days)
     
     print('subject: ' + subject)
     print('body_text: ' + body_text)
 
-    send_message_to_symphony(subject, body_text)
+    send_message_to_symphony(subject, body_text, webhook)
 
 
 ####################################################
@@ -140,10 +138,10 @@ jira = init_jira(sys.argv[1], sys.argv[2])
 if day == 0:
     # Monday
     print('Ask for 72h')
-    send(3)
+    send(3, sys.argv[3])
 elif day == 1 or day == 2 or day == 3 or day == 4:
     print('Ask for 24h')
-    send(1)
+    send(1, sys.argv[3])
 else:
     print('Weekend')
 
