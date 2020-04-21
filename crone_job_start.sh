@@ -1,7 +1,7 @@
 echo "START $(date)" >> a.txt
 
 echo "pwd : $(pwd)"
-echo "arg1: $1"
+echo "args: $*"
 
 /usr/local/bin/python3 bellman_jira.py $* >> a.txt
 
