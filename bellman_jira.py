@@ -46,11 +46,11 @@ def init_jira(user, apikey):
 ###
 def print_ticket(x):
     if str(x.fields.status) == 'Done':
-        return '  ' + '{:15}'.format(str(x.fields.status)) + ' https://perzoinc.atlassian.net/browse/' + str(x) + ' ' + str(x.fields.summary) + '<br/>'
+        return '  ' + '{:15}'.format(str(x.fields.status)) + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> ' + str(x.fields.summary) + '<br/>'
     elif str(x.fields.status) == 'Open':
         return '  ' + '{:15}'.format(str(x.fields.status)) + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> ' + str(x.fields.summary) + '<br/>'
     else:
-        return '  ' + '{:15}'.format(str(x.fields.status)) + ' https://perzoinc.atlassian.net/browse/' + str(x) + ' ' + str(x.fields.summary) + '<br/>'
+        return '  ' + '{:15}'.format(str(x.fields.status)) + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> ' + str(x.fields.summary) + '<br/>'
 
 
 ###
@@ -116,8 +116,8 @@ def send_message_to_symphony(subject, body, webhook):
 ###
 ###
 ###
-def send(days, webhook):
-    [subject, body_text] = get_new_bugs(jira, 'sda', days)
+def send(days, jira_project, webhook):
+    [subject, body_text] = get_new_bugs(jira, jira_project, days)
     
     print('subject: ' + subject)
     print('body_text: ' + body_text)
@@ -132,16 +132,33 @@ day = datetime.datetime.today().weekday()
 print('argc: ' + str(len(sys.argv)))
 print('argv[1]: ' + sys.argv[1])
 print('argv[2]: ' + sys.argv[2])
+print('argv[3]: ' + sys.argv[3])
+print('argv[4]: ' + sys.argv[4])
 
 jira = init_jira(sys.argv[1], sys.argv[2])
 
 if day == 0:
     # Monday
     print('Ask for 72h')
-    send(3, sys.argv[3])
+    
+    # Send for SDA
+    send(3, 'sda', sys.argv[3])
+
+    time.sleep(5)
+
+    # Send for RTC
+    send(3,  'rtc', sys.argv[4])
+
 elif day == 1 or day == 2 or day == 3 or day == 4:
     print('Ask for 24h')
-    send(1, sys.argv[3])
+
+    # Send for SDA
+    send(1, 'sda', sys.argv[3])
+
+    time.sleep(5)
+
+    # Send for RTC
+    send(1, 'rtc', sys.argv[4])
 else:
     print('Weekend')
 
