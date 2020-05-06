@@ -229,7 +229,7 @@ else:
 
 
 
-show_number_of_builds = 2
+show_number_of_builds = 20
 
 NEW_LINE = '<br/>\n'
 
