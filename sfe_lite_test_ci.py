@@ -181,7 +181,7 @@ def get_build_list():
     text2 += '   Number of passed  : ' + str(nr_pass) + NEW_LINE
     text2 += '   Average duration  : ' + duration_readable(total_duration/(nr_fail + nr_aborted + nr_pass)) + NEW_LINE
     text2 += '-----------------------------------------' + NEW_LINE
-    text2 += BOLD + 'TL;TR, pass-rate: ' + '{:2.1f}'.format(nr_pass/(nr_fail + nr_aborted)*100) + '%' + BOLD_RESET + NEW_LINE
+    text2 += BOLD + 'TL;TR, pass-rate: ' + '{:2.1f}'.format(nr_pass/(nr_pass + nr_fail + nr_aborted)*100) + '%' + BOLD_RESET + NEW_LINE
 
     return [text, text2]
 
