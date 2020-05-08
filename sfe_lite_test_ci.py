@@ -151,6 +151,7 @@ def get_build_list():
     nr_aborted = 0
 
     text = ''
+    text2 = ''
 
     total_duration = 0
 
@@ -174,14 +175,15 @@ def get_build_list():
         else:
             nr_pass += 1
 
-    text += NEW_LINE
-    text += '   Number of failed  : ' + str(nr_fail) + NEW_LINE
-    text += '   Number of aborted : ' + str(nr_aborted) + NEW_LINE
-    text += '   Number of building: ' + str(nr_building) + NEW_LINE
-    text += '   Number of passed  : ' + str(nr_pass) + NEW_LINE
-    text += '   Average duration  : ' + duration_readable(total_duration/(nr_fail + nr_aborted + nr_pass)) + NEW_LINE
+    text2 += '   Number of failed  : ' + str(nr_fail) + NEW_LINE
+    text2 += '   Number of aborted : ' + str(nr_aborted) + NEW_LINE
+    text2 += '   Number of building: ' + str(nr_building) + NEW_LINE
+    text2 += '   Number of passed  : ' + str(nr_pass) + NEW_LINE
+    text2 += '   Average duration  : ' + duration_readable(total_duration/(nr_fail + nr_aborted + nr_pass)) + NEW_LINE
+    text2 += '-----------------------------------------' + NEW_LINE
+    text2 += BOLD + 'TL;TR, pass-rate: ' + '{:2.1f}'.format(nr_pass/(nr_fail + nr_aborted)*100) + '%' + BOLD_RESET + NEW_LINE
 
-    return text
+    return [text, text2]
 
 ###
 ###
@@ -230,11 +232,11 @@ elif len(sys.argv) == 2:
 else:
     usage()
 
-
-
 show_number_of_builds = 20
 
 NEW_LINE = '<br/>\n'
+BOLD = '<b>'
+BOLD_RESET = '</b>'
 
 subject = 'SFE-Lite Continuous-Integration' + ' (last ' + str(show_number_of_builds) + ' builds)'
 body = ''
@@ -255,11 +257,15 @@ for x in range(last_build_number-show_number_of_builds+1, last_build_number+1):
 
     get_build_test_report(url, job_name, job_name2, x)
 
-body += get_build_list()
+[text, text2] = get_build_list()
+body += text
 
-body += ' ' + NEW_LINE 
+body += '-----------------------------------------' + NEW_LINE
 
 body += '<b>Test case report: </b>' + NEW_LINE
 body += print_test_case_list()
+
+body += '-----------------------------------------' + NEW_LINE
+body += text2
 
 send_message_to_symphony(subject, body, web_url)
