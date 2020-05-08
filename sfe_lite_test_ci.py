@@ -157,8 +157,11 @@ def get_build_list():
     for x in build_list:
         if build_list[x]['duration'] == '':
             text += '   ' + str(x) + ' ' + build_list[x]['result'] + NEW_LINE
-        else:    
-            text += '   ' + str(x) + ' ' + build_list[x]['result'] + '  duration: ' + duration_readable(build_list[x]['duration']) + ' (fail: ' + str(build_list[x]['failed']) + ' skip: ' + str(build_list[x]['skipped']) + ' pass: ' + str(build_list[x]['passed']) + ')' + NEW_LINE
+        else:   
+            if 'failed' in build_list[x]:
+                text += '   ' + str(x) + ' ' + build_list[x]['result'] + '  duration: ' + duration_readable(build_list[x]['duration']) + ' (fail: ' + str(build_list[x]['failed']) + ' skip: ' + str(build_list[x]['skipped']) + ' pass: ' + str(build_list[x]['passed']) + ')' + NEW_LINE
+            else:
+                text += '   ' + str(x) + ' ' + build_list[x]['result'] + '  duration: ' + duration_readable(build_list[x]['duration'])  + NEW_LINE
 
             total_duration += build_list[x]['duration']
 
