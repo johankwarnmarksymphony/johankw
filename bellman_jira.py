@@ -6,6 +6,7 @@ import datetime
 import humanfriendly
 from jira import JIRA, JIRAError
 
+NEW_LINE = '<br/>\n'
 
 ###
 ### Check day, Monday->72, Tuesday-Friday 24 Saturday-Sunday 0
@@ -13,6 +14,7 @@ from jira import JIRA, JIRAError
 ### Send the list with websocket to Symphony
 ###
 ###
+
 
 
 ###
@@ -46,11 +48,11 @@ def init_jira(user, apikey):
 ###
 def print_ticket(x):
     if str(x.fields.status) == 'Done':
-        return '  ' + '{:15}'.format(str(x.fields.status)) + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> ' + str(x.fields.summary) + '<br/>'
+        return '  ' + '{:15}'.format(str(x.fields.status)) + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> ' + str(x.fields.summary) + NEW_LINE
     elif str(x.fields.status) == 'Open':
-        return '  ' + '{:15}'.format(str(x.fields.status)) + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> ' + str(x.fields.summary) + '<br/>'
+        return '  ' + '{:15}'.format(str(x.fields.status)) + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> ' + str(x.fields.summary) + NEW_LINE
     else:
-        return '  ' + '{:15}'.format(str(x.fields.status)) + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> '+ str(x.fields.summary) + '<br/>'
+        return '  ' + '{:15}'.format(str(x.fields.status)) + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> '+ str(x.fields.summary) + NEW_LINE
 
 
 ###
@@ -89,23 +91,40 @@ def get_new_bugs(jira, jira_project, days):
 ###
 ###
 ###
-#    data = '<messageML> \
-#This is an example of the sort of text that you can fit within the Universal Webhook Integration. Your service can post updates here!<br/>\
-#<b>You can also bold me</b>: Or not.<br/>\
-#<b>You can submit links as well: </b><a href="https://google.com" /><br/>\
-#<i>You can make text render in italic font</i><br/>\
-#Labels can also come through: <hash tag="label"/> and you can make tickers appear too: <cash tag="GOOG"/><br/>\
-#You can directly mention people using email matching: <mention email="vincent@symphony.com"/><br/>\
-#You can send lists too:<br/>\
-#<ul><li>item1</li><li>item2</li></ul><br/>\
-#You can even send tables:<br/>\
-#<table><tr><td>header1</td><td>header2</td></tr><tr><td>info1</td><td>info2</td></tr><tr><td>info1</td><td>info2</td></tr><tr><td>info1</td><td>info2</td></tr></table>\
-#</messageML>'
+def get_number_of_tickets(jira, jira_project, jql):
+    jql = 'project = ' + jira_project + ' AND ' + jql
 
+    tickets = jira.search_issues(jql, maxResults=None)
+
+    return len(tickets)
+
+
+###
+###
+###
+def get_bug_stats(jira, jira_project, days):
+    number_of_bugs = get_number_of_tickets(jira, jira_project, 'type = Bug and status != done ORDER BY priority DESC')
+
+    number_of_new_bugs = get_number_of_tickets(jira, jira_project, 'type = Bug and createdDate >= -' + str(days)  + 'd ORDER BY priority DESC')
+
+    number_of_done_bugs = get_number_of_tickets(jira, jira_project, 'type = Bug and status CHANGED TO done after -' + str(days) + 'd ORDER BY createdDate')
+
+    text =  '  Total number of bugs: ' + str(number_of_bugs) + NEW_LINE
+    text += '  New bugs last ' + str(days) + 'days : ' + str(number_of_new_bugs) + NEW_LINE
+    text += '  Done bugs last ' + str(days) + 'days: ' + str(number_of_done_bugs) + NEW_LINE
+
+    return text
+
+###
+###
+###
 def send_message_to_symphony(subject, body, webhook):
-    data = '<messageML><b>' + subject + '</b><br/>' + body + '</messageML>'
+    data = '<messageML><b>' + subject + '</b>' + NEW_LINE + body + '</messageML>'
 
     print('data: ' + data)
+
+    if webhook == '':
+        return
 
     r = requests.post(webhook, data=data)
 
@@ -119,6 +138,10 @@ def send_message_to_symphony(subject, body, webhook):
 def send(days, jira_project, webhook):
     [subject, body_text] = get_new_bugs(jira, jira_project, days)
     
+    if days >= 7:
+        body_text += '------------------------' + NEW_LINE
+        body_text += get_bug_stats(jira, jira_project, days)
+
     print('subject: ' + subject)
     print('body_text: ' + body_text)
 
@@ -135,8 +158,18 @@ print('argc: ' + str(len(sys.argv)))
 print('argv[1]: ' + sys.argv[1])
 print('argv[2]: ' + sys.argv[2])
 print('argv[3]: ' + sys.argv[3])
-print('argv[4]: ' + sys.argv[4])
-print('argv[5]: ' + sys.argv[5])
+
+if len(sys.argv) > 4:
+    print('argv[4]: ' + sys.argv[4])
+    webhook_sda = sys.argv[4]
+else:
+    webhook_sda = ''
+
+if len(sys.argv) > 5:
+    print('argv[5]: ' + sys.argv[5])
+    webhook_rtc = sys.argv[5]
+else:
+    webhook_rtc = ''
 
 jira = init_jira(sys.argv[2], sys.argv[3])
 
@@ -146,33 +179,33 @@ if sys.argv[1] == 'daily':
         print('Ask for 72h')
     
         # Send for SDA
-        send(3, 'sda', sys.argv[4])
+        send(3, 'sda', webhook_sda)
 
         time.sleep(5)
 
         # Send for RTC
-        send(3,  'rtc', sys.argv[5])
+        send(3,  'rtc', webhook_rtc)
 
     elif day == 1 or day == 2 or day == 3 or day == 4:
         print('Ask for 24h')
 
         # Send for SDA
-        send(1, 'sda', sys.argv[4])
+        send(1, 'sda', webhook_sda)
 
         time.sleep(5)
 
         # Send for RTC
-        send(1, 'rtc', sys.argv[5])
+        send(1, 'rtc', webhook_rtc)
     else:
         print('Weekend')
 elif sys.argv[1] == 'weekly':
     # Send for SDA
-    send(7, 'sda', sys.argv[4])
+    send(7, 'sda', webhook_sda)
 
     time.sleep(5)
 
     # Send for RTC
-    send(7,  'rtc', sys.argv[5])
+    send(7,  'rtc', webhook_rtc)
 else:
     print('Error sys.argv[1]: ' + sys.argv[1])
 
