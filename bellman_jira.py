@@ -47,12 +47,9 @@ def init_jira(user, apikey):
 ###
 ###
 def print_ticket(x):
-    if str(x.fields.status) == 'Done':
-        return '  ' + '{:15}'.format(str(x.fields.status)) + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> ' + str(x.fields.summary) + NEW_LINE
-    elif str(x.fields.status) == 'Open':
-        return '  ' + '{:15}'.format(str(x.fields.status)) + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> ' + str(x.fields.summary) + NEW_LINE
-    else:
-        return '  ' + '{:15}'.format(str(x.fields.status)) + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> '+ str(x.fields.summary) + NEW_LINE
+    summary = str(x.fields.summary).replace('\uff0e', '.') .replace('\u2019', '\'')
+
+    return '  ' + '{:15}'.format(str(x.fields.status)) + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> ' + summary + NEW_LINE
 
 
 ###
