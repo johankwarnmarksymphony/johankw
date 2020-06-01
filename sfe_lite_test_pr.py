@@ -39,7 +39,7 @@ def get_latest_pr_number(prefix_url, job_name, job_name2):
     r = requests.get(url + '/api/json')
 
     if r.status_code != 200:
-        print('get_latest_build_number, Failed to get data')
+        print('get_latest_pr_number, Failed to get data')
         sys.exit(1)
 
     biggest = 0
@@ -59,7 +59,7 @@ def get_status_of_pull_request_attempt(url, silent):
     r = requests.get(url)
 
     if r.status_code != 200:
-        print('get_latest_build_number, Failed to get data')
+        print('get_status_of_pull_request_attempt, Failed to get data')
         sys.exit(1)
 
     duration_s = r.json()['duration']/1000
@@ -87,8 +87,9 @@ def get_number_of_attempts_pull_request(prefix_url, job_name, job_name2, pr_numb
     r = requests.get(url + '/api/json')
 
     if r.status_code != 200:
-        print('get_latest_build_number, Failed to get data')
-        sys.exit(1)
+        print('url: ' + url)
+        print('get_number_of_attempts_pull_request, Failed to get data')
+        return 0
 
     number_of_tries = r.json()['lastBuild']['number']
 
@@ -104,7 +105,7 @@ def get_pull_request_status(prefix_url, job_name, job_name2, pr_number):
     r = requests.get(url + '/api/json')
 
     if r.status_code != 200:
-        print('get_latest_build_number, Failed to get data')
+        print('get_pull_request_status, Failed to get data')
         sys.exit(1)
 
     attempt = r.json()['lastBuild']['number']
@@ -211,6 +212,9 @@ for x in range(last_pr-show_number_of_pull_requests+1, last_pr+1):
     print('pr_name: ' + pr_name)
 
     number_of_attempts = get_number_of_attempts_pull_request(url, job_name, job_name2, pr_name)
+
+    if number_of_attempts == 0:
+        continue
 
     [pr_status, duration] = get_pull_request_status(url, job_name, job_name2, pr_name)
 
