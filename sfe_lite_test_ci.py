@@ -243,7 +243,7 @@ body = ''
 
 url = 'https://jenkins.rtc.dev.symphony.com/job/'
 job_name =  'SFE-Lite'
-job_name2 = 'Continuous-Integration'
+job_name2 = 'Continuous-Integration-20.5'
 
 
 last_build_number = get_last_build_number(url, job_name, job_name2)
