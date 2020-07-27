@@ -243,16 +243,19 @@ body = ''
 
 url = 'https://jenkins.rtc.dev.symphony.com/job/'
 job_name =  'SFE-Lite'
-job_name2 = 'Continuous-Integration-20.5'
+job_name2 = 'Continuous-Integration-Master'
 
 
 last_build_number = get_last_build_number(url, job_name, job_name2)
+
+print('last_build_number: ' + str(last_build_number))
 
 body += NEW_LINE
 
 body += create_link(url + job_name + '/job/' + job_name2) + NEW_LINE
 
 for x in range(last_build_number-show_number_of_builds+1, last_build_number+1):
+    print('build-number: ' + str(x))
     get_build_status(url, job_name, job_name2, x)
 
     get_build_test_report(url, job_name, job_name2, x)
