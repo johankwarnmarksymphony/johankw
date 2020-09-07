@@ -6,6 +6,7 @@ from datetime import datetime
 import urllib.parse
 import os
 import socket
+from requests import get
 
 
 ###
@@ -300,7 +301,7 @@ def write_test_cases(path, filename, test_cases):
 
 #################################################
 
-my_ip_address = (socket.gethostbyname_ex(socket.gethostname())[-1])[0]
+my_ip_address = get('https://api.ipify.org').text
 
 print('my_ip_address: ' + my_ip_address)
 
