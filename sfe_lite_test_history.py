@@ -13,7 +13,7 @@ import socket
 ###
 def usage():
     print('')
-    print('  python ' + sys.argv[0])
+    print('  python ' + sys.argv[0] + ' <bot websocket> <web_server_directory')
     print('')
     print('  (' + str(sys.argv) + ')')
     print('')
@@ -307,15 +307,17 @@ print('my_ip_address: ' + my_ip_address)
 
 if len(sys.argv) == 1:
     web_url = ''
+    web_server_path = '/Users/johan.kwarnmark/src/web-server/'
     bot = False
-elif len(sys.argv) == 2:
+elif len(sys.argv) == 3:
     web_url = sys.argv[1]
+    web_server_path = sys.argv[2]
+
     bot = True
 else:
     usage()
 
 show_number_of_builds = 10
-web_server_path = '/Users/johan.kwarnmark/src/web-server/'
 
 
 if bot:
