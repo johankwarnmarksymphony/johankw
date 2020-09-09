@@ -9,6 +9,7 @@ import socket
 from requests import get
 
 
+
 ###
 ###
 ###
@@ -25,14 +26,27 @@ test_case_list = {}
 ###
 ###
 ###
-def add_test_case(class_name, name, pr_name, status):
+def add_test_case(class_name, name, pr_name, status, test_log_url):
     key = class_name + '-' + name
 
+    #if test_log_url:
+    #    print('add_test_case, test_log_url: ' + test_log_url)
+
     if key in test_case_list:
-        test_case_list[key].append(status)
+        test_case_list[key].append({'status': status, 'test_log': test_log_url})
     else:
-        test_case_list[key] = [status]
+        test_case_list[key] = [{'status': status, 'test_log': test_log_url}]
+
+###
+###
+###
+def has_status(list, status):
+    for x in list:
+        if x['status'] == status:
+            return True
         
+    return False
+
 ###
 ###
 ###
@@ -47,14 +61,16 @@ def print_test_case_list():
 
         number_of_times_this_test_run = len(test_case_list[x])
         
+        # print(str(len(test_case_list[x])) + '  test_case_list[x]: ' + str(test_case_list[x]))
+
         if number_of_times_this_test_run > 2:
-            if 'FAILED' in test_case_list[x]:
-                #print('x: ' + x + '  ' + str(test_case_list[x]))
+            if has_status(test_case_list[x], 'FAILED'):
+                print('x: ' + x + '  ' + str(test_case_list[x]))
                 #print('x: ' + x)
                 #print('    ' + str(test_case_list[x]))
 
                 nr_of_failed_tests += 1
-                flaky_test.append({'test_case': x, 'result': test_case_list[x]})
+                flaky_test.append({'test_case': x, 'result': (test_case_list[x])})
             else:
                 nr_of_stable_tests += 1
         #else:
@@ -66,23 +82,6 @@ def print_test_case_list():
 
     return [nr_of_stable_tests, flaky_test]
 
-failed_test_case_list = {}
-###
-###
-###
-def add_failed_test_case(class_name, name, pr_name):
-    key = class_name + '-' + name
-
-    if key in failed_test_case_list:
-        if not pr_name in failed_test_case_list[key]:
-            failed_test_case_list[key].append(pr_name)
-        #else:<
-        #    print('duplicate ' + key)
-
-        # = failed_test_case_list[key] + ' ' + pr_name
-    else:
-        failed_test_case_list[key] = [pr_name]
-        
 
 ###
 ###
@@ -234,7 +233,7 @@ def get_build_test_report(prefix_url, job_name, job_name2, build_number):
             status = y['status']
 
             if status == 'FAILED' or status == 'REGRESSION':
-                add_failed_test_case(class_name, name, build_number)
+                #add_failed_test_case(class_name, name, build_number)
                 nr_fail += 1
             elif status == 'PASSED' or status == 'FIXED':
                 nr_pass += 1
@@ -251,11 +250,16 @@ def get_build_test_report(prefix_url, job_name, job_name2, build_number):
                 status = y['status']
 
                 if status == 'FAILED' or status == 'REGRESSION':
-                    add_test_case(class_name, name, build_number, 'FAILED')
+                    tmp_name = name.replace('"', '_').replace(' ', '_').replace(':', '_').replace('#', '_').replace('.', '_').replace('-', '_').replace(',', '_')
+                    tmp_class_name = class_name.replace(':', '_')
+
+                    test_log_url = url + '(root)/' + urllib.parse.quote(tmp_class_name + '/' + tmp_name + '/')
+
+                    add_test_case(class_name, name, build_number, 'FAILED', test_log_url)
                 elif status == 'PASSED' or status == 'FIXED':
-                    add_test_case(class_name, name, build_number, 'PASSED')
+                    add_test_case(class_name, name, build_number, 'PASSED', '')
                 elif status == 'SKIPPED':
-                    add_test_case(class_name, name, build_number, 'SKIPPED')
+                    add_test_case(class_name, name, build_number, 'SKIPPED', '')
                 else:
                     print('error status: ' + status)
     else:
@@ -280,6 +284,7 @@ def create_path_name():
     
     return now.strftime("%Y-%m-%d-%H-%M")
 
+
 ###
 ###
 ###
@@ -295,7 +300,13 @@ def write_test_cases(path, filename, test_cases):
     f = open(path + '/' + filename, 'w')
 
     for x in test_cases:
-        f.write(x + '<br/>\n')
+        f.write('<b>' + x['testcase'] + '</b><br/>\n')
+        #print('   ' + filename + ': ' + x['testcase'])
+
+        for q in x['result']:
+            if q['test_log']:
+                f.write('   <p><a href=\"' + q['test_log'] + '\">' + 'log</a></p>\n')
+                #print('      ' + q['test_log'])
     f.close()
 
 
@@ -375,25 +386,21 @@ failed_last_2 = []
 flaky_test = []
 
 for x in test_failed:
-    
-    #print('Flaky: ' + str(x))
-    #print('q: ' + (x['result'])[-1])
 
-    if (x['result'])[-1] == 'SKIPPED':
-        skipped_test.append(x['test_case'])
+    if x['result'][-1]['status'] == 'SKIPPED':
+        skipped_test.append({'testcase': x['test_case'], 'result': x['result']})
         continue
 
-    if not 'PASSED' in x['result']:
-        failed_always_test.append(x['test_case'])
+    #if not 'PASSED' in x['result']:
+    if not has_status(x['result'], 'PASSED'):
+        failed_always_test.append({'testcase': x['test_case'], 'result': x['result']})
         continue
 
-    if (x['result'])[-1] == 'FAILED' and (x['result'])[-2] == 'FAILED':
-        failed_last_2.append(x['test_case'])
+    if (x['result'][-1]['status'] == 'FAILED') and (x['result'][-2]['status'] == 'FAILED'):
+        failed_last_2.append({'testcase': x['test_case'], 'result': x['result']})
         continue
 
-    if 'PASSED' in x['result']:
-        #print('at least one passed: ' + str(x['result']))
-        flaky_test.append(x['test_case'])
+    flaky_test.append({'testcase': x['test_case'], 'result': x['result']})
 
 folder_name = create_path_name()
 path = web_server_path + folder_name
@@ -403,32 +410,21 @@ if skipped_test:
     write_test_cases(path, 'skipped_test.html', skipped_test)
     body += '       tests: ' + create_link('http://' + my_ip_address + ':8080/' + folder_name + '/skipped_test.html') + NEW_LINE
 
-    #for x in skipped_test:
-    #    body += '      ' + x + NEW_LINE
-
 if failed_always_test:
     body += BOLD + '   Test failed 100%: ' + str(len(failed_always_test)) + BOLD_RESET + NEW_LINE
     write_test_cases(path, 'failed_always_test.html', failed_always_test)
     body += '       tests: ' + create_link('http://' + my_ip_address + ':8080/' + folder_name + '/failed_always_test.html') + NEW_LINE
-
-    #for x in failed_always_test:
-    #    body += '      ' + x + NEW_LINE
 
 if failed_last_2:
     body += BOLD + '   Test failed in the last two runs: ' + str(len(failed_last_2)) + BOLD_RESET + NEW_LINE
     write_test_cases(path, 'failed_last_two_runs_test.html', failed_last_2)
     body += '       tests: ' + create_link('http://' + my_ip_address + ':8080/' + folder_name + '/failed_last_two_runs_test.html') + NEW_LINE
 
-    #for x in failed_last_2:
-    #    body += '      ' + x + NEW_LINE
 
 if flaky_test:
     body += BOLD + '   Flaky tests: ' + str(len(flaky_test))  + BOLD_RESET + NEW_LINE
     write_test_cases(path, 'flaky_test.html', flaky_test)
     body += '       tests: ' + create_link('http://' + my_ip_address + ':8080/' + folder_name + '/flaky_test.html') + NEW_LINE
-
-    #for x in flaky_test:
-    #    body += '      ' + x + NEW_LINE
 
 nr_of_flaky_tests = len(flaky_test)
 
@@ -454,3 +450,4 @@ print('bot: ' + str(bot))
 
 if bot:
     send_message_to_symphony(subject, body, web_url)
+
