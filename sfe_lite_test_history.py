@@ -22,6 +22,17 @@ def usage():
 
     sys.exit(3)
 
+###
+###
+###
+def calculate_pass_rate(number_of_failed, number_of_passed):
+    total = number_of_failed + number_of_passed
+
+    if total != 0:
+        return '{:5.2f}'.format(number_of_passed/total*100) + '%'
+    else:
+        return ''
+
 test_case_list = {}
 ###
 ###
@@ -65,7 +76,7 @@ def print_test_case_list():
 
         if number_of_times_this_test_run > 2:
             if has_status(test_case_list[x], 'FAILED'):
-                print('x: ' + x + '  ' + str(test_case_list[x]))
+                #print('x: ' + x + '  ' + str(test_case_list[x]))
                 #print('x: ' + x)
                 #print('    ' + str(test_case_list[x]))
 
@@ -184,11 +195,13 @@ def get_build_list():
     for x in build_list:
         if build_list[x]['duration'] == '':
             text += '   ' + str(x) + ' ' + build_list[x]['result'] + NEW_LINE
-        else:   
-            if 'failed' in build_list[x]:
-                text += '   ' + str(x) + ' ' + build_list[x]['result'] + '  duration: ' + duration_readable(build_list[x]['duration']) + ' (fail: ' + str(build_list[x]['failed']) + ' skip: ' + str(build_list[x]['skipped']) + ' pass: ' + str(build_list[x]['passed']) + ')' + NEW_LINE
+        else:
+            if build_list[x]['result'] == 'FAILURE':
+                text += '   ' + str(x) + '  ' + calculate_pass_rate(build_list[x]['failed'], build_list[x]['passed']) + '  ' + build_list[x]['result'] + '  duration: ' + duration_readable(build_list[x]['duration']) + ' (fail: ' + str(build_list[x]['failed']) + ' skip: ' + str(build_list[x]['skipped']) + ' pass: ' + str(build_list[x]['passed']) + ')' + NEW_LINE
+            elif build_list[x]['result'] == 'ABORTED':
+                text += '   ' + str(x) + '   0.00%' + '  ' + build_list[x]['result'] + '  duration: ' + duration_readable(build_list[x]['duration']) + NEW_LINE
             else:
-                text += '   ' + str(x) + ' ' + build_list[x]['result'] + '  duration: ' + duration_readable(build_list[x]['duration'])  + NEW_LINE
+                text += '   ' + str(x) + ' 100.00%  ' + build_list[x]['result'] + '  duration: ' + duration_readable(build_list[x]['duration'])  + ' (fail: ' + str(build_list[x]['failed']) + ' skip: ' + str(build_list[x]['skipped']) + ' pass: ' + str(build_list[x]['passed']) + ')' + NEW_LINE
 
             total_duration += build_list[x]['duration']
 
