@@ -15,7 +15,7 @@ from requests import get
 ###
 def usage():
     print('')
-    print('  python ' + sys.argv[0] + ' <bot websocket> <web_server_directory')
+    print('  python ' + sys.argv[0] + ' <bot websocket> <web_server_directory> <Continuous-Integration-Master>')
     print('')
     print('  (' + str(sys.argv) + ')')
     print('')
@@ -320,11 +320,13 @@ print('my_ip_address: ' + my_ip_address)
 if len(sys.argv) == 1:
     web_url = ''
     web_server_path = '/Users/johan.kwarnmark/src/web-server/'
+    #job_name2 = 'Continuous-Integration-Master'
+    job_name2 = 'Continuous-Integration-20.8'
     bot = False
-elif len(sys.argv) == 3:
+elif len(sys.argv) == 4:
     web_url = sys.argv[1]
     web_server_path = sys.argv[2]
-
+    job_name2 = sys.argv[3]
     bot = True
 else:
     usage()
@@ -349,8 +351,6 @@ body = ''
 
 url = 'https://jenkins.rtc.dev.symphony.com/job/'
 job_name =  'SFE-Lite'
-job_name2 = 'Continuous-Integration-Master'
-#job_name2 = 'Continuous-Integration-20.8'
 
 last_build_number = get_last_build_number(url, job_name, job_name2)
 
