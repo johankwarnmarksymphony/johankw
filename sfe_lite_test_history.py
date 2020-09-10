@@ -209,7 +209,7 @@ def get_build_list():
     text2 += '-----------------------------------------' + NEW_LINE
     text2 += BOLD + 'TL;TR, pass-rate: ' + '{:2.1f}'.format(nr_pass/(nr_pass + nr_fail + nr_aborted)*100) + '%' + BOLD_RESET + NEW_LINE
     text2 += '=========================================' + NEW_LINE
-    return [text, text2]
+    return [text, text2, build_list]
 
 ###
 ###
@@ -310,6 +310,39 @@ def write_test_cases(path, filename, test_cases):
     f.close()
 
 
+###
+###
+###
+def at_least_one_build_success(build_list):
+    for x in build_list:
+        if build_list[x]['result'] == 'SUCCESS':
+            return True
+    
+    return False
+
+###
+###
+###
+def last_two_builds_failed(build_list):
+    nr_of_failures = 0
+    for x in reversed(build_list):
+        if build_list[x]['result'] == 'ABORTED':
+            continue
+
+        if build_list[x]['result'] == 'BUILDING':
+            continue
+        
+        if build_list[x]['result'] == 'SUCCESS':
+            return False
+
+        if build_list[x]['result'] == 'FAILURE':
+            nr_of_failures += 1
+
+            if nr_of_failures == 2:
+                return True
+
+    return False
+
 #################################################
 
 my_ip_address = '10.245.50.27' #get('https://api.ipify.org').text
@@ -370,7 +403,8 @@ for x in range(last_build_number-show_number_of_builds+1, last_build_number+1):
         continue
     get_build_test_report(url, job_name, job_name2, x)
 
-[text, text2] = get_build_list()
+[text, text2, build_list] = get_build_list()
+
 body += text
 
 body += '-----------------------------------------' + NEW_LINE
@@ -392,11 +426,11 @@ for x in test_failed:
         continue
 
     #if not 'PASSED' in x['result']:
-    if not has_status(x['result'], 'PASSED'):
+    if (not has_status(x['result'], 'PASSED')) and (not at_least_one_build_success(build_list)):
         failed_always_test.append({'testcase': x['test_case'], 'result': x['result']})
         continue
 
-    if (x['result'][-1]['status'] == 'FAILED') and (x['result'][-2]['status'] == 'FAILED'):
+    if (last_two_builds_failed(build_list) and x['result'][-1]['status'] == 'FAILED') and (x['result'][-2]['status'] == 'FAILED'):
         failed_last_2.append({'testcase': x['test_case'], 'result': x['result']})
         continue
 
