@@ -346,6 +346,8 @@ def last_two_builds_failed(build_list):
 #################################################
 
 my_ip_address = '10.245.50.27' #get('https://api.ipify.org').text
+url = 'https://jenkins.rtc.dev.symphony.com/job/'
+job_name =  'SFE-Lite'
 
 print('my_ip_address: ' + my_ip_address)
 
@@ -379,11 +381,10 @@ else:
 
 
 
-subject = 'SFE-Lite ' + job_name2  + ' (last ' + str(show_number_of_builds) + ' builds)'
+subject = job_name + ' ' + job_name2  + ' (last ' + str(show_number_of_builds) + ' builds)'
 body = ''
 
-url = 'https://jenkins.rtc.dev.symphony.com/job/'
-job_name =  'SFE-Lite'
+
 
 last_build_number = get_last_build_number(url, job_name, job_name2)
 
