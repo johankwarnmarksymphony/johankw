@@ -379,7 +379,7 @@ else:
 
 
 
-subject = 'SFE-Lite Continuous-Integration MASTER' + ' (last ' + str(show_number_of_builds) + ' builds)'
+subject = 'SFE-Lite ' + job_name2  + ' (last ' + str(show_number_of_builds) + ' builds)'
 body = ''
 
 url = 'https://jenkins.rtc.dev.symphony.com/job/'
