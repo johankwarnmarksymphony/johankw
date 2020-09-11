@@ -360,7 +360,8 @@ def last_two_builds_failed(build_list):
 
 my_ip_address = '10.245.50.27' #get('https://api.ipify.org').text
 url = 'https://jenkins.rtc.dev.symphony.com/job/'
-job_name =  'SFE-Lite'
+
+
 
 print('my_ip_address: ' + my_ip_address)
 
@@ -368,13 +369,18 @@ print('my_ip_address: ' + my_ip_address)
 if len(sys.argv) == 1:
     web_url = ''
     web_server_path = '/Users/johan.kwarnmark/src/web-server/'
+    #job_name =  'SFE-Lite'
     #job_name2 = 'Continuous-Integration-Master'
-    job_name2 = 'Continuous-Integration-20.8'
+    #job_name2 = 'Continuous-Integration-20.8'
+    job_name = 'SFE-RTC'
+    #job_name2 = 'Daily%20E2E%20CI%20St2%20C2'
+    job_name2 = 'Daily%20E2E%20CI%20St2%20C1'
     bot = False
-elif len(sys.argv) == 4:
+elif len(sys.argv) == 5:
     web_url = sys.argv[1]
     web_server_path = sys.argv[2]
-    job_name2 = sys.argv[3]
+    job_name = sys.argv[3]
+    job_name2 = sys.argv[4]
     bot = True
 else:
     usage()
