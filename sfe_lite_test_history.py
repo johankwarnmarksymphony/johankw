@@ -295,7 +295,7 @@ def create_path_name():
     # datetime object containing current date and time
     now = datetime.now()
     
-    return job_name + '/' + job_name2 + '/' + now.strftime("%Y-%m-%d-%H-%M")
+    return job_name + '/' + job_name2.replace('%20', '-') + '/' + now.strftime("%Y-%m-%d-%H-%M")
 
 
 ###
