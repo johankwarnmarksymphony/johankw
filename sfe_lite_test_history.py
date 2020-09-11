@@ -400,7 +400,7 @@ else:
 
 
 
-subject = job_name + ' ' + job_name2  + ' (last ' + str(show_number_of_builds) + ' builds)'
+subject = job_name + ' ' + job_name2.replace('%20', ' ')  + ' (last ' + str(show_number_of_builds) + ' builds)'
 body = ''
 
 
