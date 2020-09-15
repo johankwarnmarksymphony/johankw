@@ -197,7 +197,8 @@ def get_build_list():
             text += '   ' + str(x) + ' ' + build_list[x]['result'] + NEW_LINE
         else:
             if build_list[x]['result'] == 'FAILURE':
-                text += '   ' + str(x) + '  ' + calculate_pass_rate(build_list[x]['failed'], build_list[x]['passed']) + '  ' + build_list[x]['result'] + '  duration: ' + duration_readable(build_list[x]['duration']) + ' (fail: ' + str(build_list[x]['failed']) + ' skip: ' + str(build_list[x]['skipped']) + ' pass: ' + str(build_list[x]['passed']) + ')' + NEW_LINE
+                if 'failed' in build_list[x]:
+                    text += '   ' + str(x) + '  ' + calculate_pass_rate(build_list[x]['failed'], build_list[x]['passed']) + '  ' + build_list[x]['result'] + '  duration: ' + duration_readable(build_list[x]['duration']) + ' (fail: ' + str(build_list[x]['failed']) + ' skip: ' + str(build_list[x]['skipped']) + ' pass: ' + str(build_list[x]['passed']) + ')' + NEW_LINE
             elif build_list[x]['result'] == 'ABORTED':
                 text += '   ' + str(x) + '   0.00%' + '  ' + build_list[x]['result'] + '  duration: ' + duration_readable(build_list[x]['duration']) + NEW_LINE
             else:
@@ -302,9 +303,9 @@ def create_path_name():
 ###
 ###
 def write_test_cases(path, filename, test_cases):
-    print('write_test_cases, path      : ' + path)
-    print('write_test_cases, filename  : ' + filename)
-    print('write_test_cases, test_cases: ' + str(test_cases))
+    #print('write_test_cases, path      : ' + path)
+    #print('write_test_cases, filename  : ' + filename)
+    #print('write_test_cases, test_cases: ' + str(test_cases))
     
     # Create directory
     if not os.path.exists(path):
@@ -373,8 +374,8 @@ if len(sys.argv) == 1:
     #job_name2 = 'Continuous-Integration-Master'
     #job_name2 = 'Continuous-Integration-20.8'
     job_name = 'SFE-RTC'
-    #job_name2 = 'Daily%20E2E%20CI%20St2%20C2'
-    job_name2 = 'Daily%20E2E%20CI%20St2%20C1'
+    job_name2 = 'Daily%20E2E%20CI%20St2%20C2'
+    #job_name2 = 'Daily%20E2E%20CI%20St2%20C1'
     bot = False
 elif len(sys.argv) == 5:
     web_url = sys.argv[1]
