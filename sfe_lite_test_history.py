@@ -37,16 +37,16 @@ test_case_list = {}
 ###
 ###
 ###
-def add_test_case(class_name, name, pr_name, status, test_log_url):
+def add_test_case(class_name, name, duration, build_number, status, test_log_url):
     key = class_name + '-' + name
 
     #if test_log_url:
     #    print('add_test_case, test_log_url: ' + test_log_url)
 
     if key in test_case_list:
-        test_case_list[key].append({'status': status, 'test_log': test_log_url})
+        test_case_list[key].append({'status': status, 'duration': duration, 'build_number': build_number, 'test_log': test_log_url})
     else:
-        test_case_list[key] = [{'status': status, 'test_log': test_log_url}]
+        test_case_list[key] = [{'status': status, 'duration': duration, 'build_number': build_number, 'test_log': test_log_url}]
 
 ###
 ###
@@ -68,7 +68,10 @@ def print_test_case_list():
 
     flaky_test = []
 
+    test_case_duration_list = {}
+
     for x in test_case_list:
+        test_case_duration_list[x] = test_case_list[x][0]['duration']
 
         number_of_times_this_test_run = len(test_case_list[x])
         
@@ -91,7 +94,10 @@ def print_test_case_list():
     #print('nr_of_stable_tests: ' + str(nr_of_stable_tests))
     #print('nr_of_failed_tests : ' + str(nr_of_failed_tests))
 
-    return [nr_of_stable_tests, flaky_test]
+    # Sort after duration
+    test_case_duration_list = sorted(test_case_duration_list.items(), key = lambda kv:(kv[1], kv[0]), reverse=True)
+
+    return [nr_of_stable_tests, flaky_test, test_case_duration_list]
 
 
 ###
@@ -262,6 +268,7 @@ def get_build_test_report(prefix_url, job_name, job_name2, build_number):
                 class_name = y['className']
                 name = y['name']
                 status = y['status']
+                duration = y['duration']
 
                 if status == 'FAILED' or status == 'REGRESSION':
                     tmp_name = name.replace('"', '_').replace(' ', '_').replace(':', '_').replace('#', '_').replace('.', '_').replace('-', '_').replace(',', '_')
@@ -269,11 +276,11 @@ def get_build_test_report(prefix_url, job_name, job_name2, build_number):
 
                     test_log_url = url + '(root)/' + urllib.parse.quote(tmp_class_name + '/' + tmp_name + '/')
 
-                    add_test_case(class_name, name, build_number, 'FAILED', test_log_url)
+                    add_test_case(class_name, name, duration, build_number, 'FAILED', test_log_url)
                 elif status == 'PASSED' or status == 'FIXED':
-                    add_test_case(class_name, name, build_number, 'PASSED', '')
+                    add_test_case(class_name, name, duration, build_number, 'PASSED', '')
                 elif status == 'SKIPPED':
-                    add_test_case(class_name, name, build_number, 'SKIPPED', '')
+                    add_test_case(class_name, name, duration, build_number, 'SKIPPED', '')
                 else:
                     print('error status: ' + status)
     else:
@@ -323,6 +330,24 @@ def write_test_cases(path, filename, test_cases):
                 #print('      ' + q['test_log'])
     f.close()
 
+###
+###
+###
+def write_test_cases_duration(path, filename, tests):
+    # Create directory
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    f = open(path + '/' + filename, 'w')
+
+    #for x in q:
+    #    print(str(x[1]) + '   ' + str(x[0]))write_test_cases
+
+    for x in tests:
+        f.write(str(x[1]) + '&nbsp;&nbsp;&nbsp;&nbsp;' + str(x[0]) + '<br/>\n')
+
+    f.close()
+
 
 ###
 ###
@@ -370,11 +395,11 @@ print('my_ip_address: ' + my_ip_address)
 if len(sys.argv) == 1:
     web_url = ''
     web_server_path = '/Users/johan.kwarnmark/src/web-server/'
-    #job_name =  'SFE-Lite'
-    #job_name2 = 'Continuous-Integration-Master'
+    job_name =  'SFE-Lite'
+    job_name2 = 'Continuous-Integration-Master'
     #job_name2 = 'Continuous-Integration-20.8'
-    job_name = 'SFE-RTC'
-    job_name2 = 'Daily%20E2E%20CI%20St2%20C2'
+    #job_name = 'SFE-RTC'
+    #job_name2 = 'Daily%20E2E%20CI%20St2%20C2'
     #job_name2 = 'Daily%20E2E%20CI%20St2%20C1'
     bot = False
 elif len(sys.argv) == 5:
@@ -432,8 +457,7 @@ body += '-----------------------------------------' + NEW_LINE
 
 body += text2
 
-[nr_of_stable_tests, test_failed] = print_test_case_list()
-
+[nr_of_stable_tests, test_failed, test_case_duration_list] = print_test_case_list()
 
 skipped_test = []
 failed_always_test = []
@@ -480,6 +504,12 @@ if flaky_test:
     body += BOLD + '   Flaky tests: ' + str(len(flaky_test))  + BOLD_RESET + NEW_LINE
     write_test_cases(path, 'flaky_test.html', flaky_test)
     body += '       tests: ' + create_link('http://' + my_ip_address + ':8080/' + folder_name + '/flaky_test.html') + NEW_LINE
+
+if test_case_duration_list:
+    body += BOLD + '   Test cases duration ' + BOLD_RESET + NEW_LINE
+    write_test_cases_duration(path, 'test_cases_duration.html', test_case_duration_list)
+    body += '       tests: ' + create_link('http://' + my_ip_address + ':8080/' + folder_name + '/test_cases_duration.html') + NEW_LINE
+
 
 nr_of_flaky_tests = len(flaky_test)
 
