@@ -71,7 +71,7 @@ def print_test_case_list():
     test_case_duration_list = {}
 
     for x in test_case_list:
-        test_case_duration_list[x] = test_case_list[x][0]['duration']
+        test_case_duration_list[x] = [test_case_list[x][0]['duration'], test_case_list[x][0]['status']]
 
         number_of_times_this_test_run = len(test_case_list[x])
         
@@ -348,7 +348,7 @@ def write_test_cases_duration(path, filename, tests):
     #    print(str(x[1]) + '   ' + str(x[0]))write_test_cases
 
     for x in tests:
-        f.write(str(x[1]) + '&nbsp;&nbsp;&nbsp;&nbsp;' + str(x[0]) + '<br/>\n')
+        f.write(str(x[1][0]) + '&nbsp;&nbsp;&nbsp;&nbsp;' + str(x[1][1]) + '&nbsp;&nbsp;&nbsp;&nbsp;' + str(x[0]) + '<br/>\n')
 
     f.close()
 
