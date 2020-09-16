@@ -271,10 +271,14 @@ def get_build_test_report(prefix_url, job_name, job_name2, build_number):
                 duration = y['duration']
 
                 if status == 'FAILED' or status == 'REGRESSION':
-                    tmp_name = name.replace('"', '_').replace(' ', '_').replace(':', '_').replace('#', '_').replace('.', '_').replace('-', '_').replace(',', '_')
-                    tmp_class_name = class_name.replace(':', '_')
+                    tmp_name = name.replace('"', '_').replace(' ', '_').replace(':', '_').replace('#', '_').replace('.', '_').replace('-', '_').replace(',', '_').replace('/', '_').replace('(', '_').replace(')', '_').replace('@', '_').replace('&', '_')
+                    tmp_class_name = class_name.replace(':', '_').replace('/', '_')
 
-                    test_log_url = url + '(root)/' + urllib.parse.quote(tmp_class_name + '/' + tmp_name + '/')
+                    test_log_url = url + '(root)/' + urllib.parse.quote(tmp_class_name + '/') + tmp_name + '/'
+
+                    #print('tmp_class_name: ' + tmp_class_name)
+                    #print('tmp_name: ' + tmp_name)
+                    #print('test_log_url: ' + test_log_url)
 
                     add_test_case(class_name, name, duration, build_number, 'FAILED', test_log_url)
                 elif status == 'PASSED' or status == 'FIXED':
