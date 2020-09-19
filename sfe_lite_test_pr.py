@@ -5,7 +5,6 @@ import time
 from datetime import datetime
 import urllib.parse
 
-
 ###
 ###
 ###
@@ -17,6 +16,29 @@ def usage():
     print('')
 
     sys.exit(3)
+
+
+###
+###
+###
+if len(sys.argv) == 1:
+    #job_name =  'SFE-Lite'
+    #job_name2 = 'PR-E2E'
+    job_name = 'SFE-RTC'
+    #job_name2 = 'PR%20IntTest%20runner%20C1'
+    job_name2 = 'PR%20IntTest%20runner%20C2'
+
+    show_number_of_pull_requests = 10
+
+    web_url = ''
+elif len(sys.argv) == 5:
+    job_name                     = sys.argv[1]
+    job_name2                    = sys.argv[2]
+    show_number_of_pull_requests = int(sys.argv[3])
+    web_url                      = sys.argv[4]
+else:
+    usage()
+
 
 ###
 ###
@@ -170,27 +192,17 @@ def create_link(link):
     return '<a href=\"' + link + '\" />'
 
 #################################################
-if len(sys.argv) == 1:
-    web_url = ''
-elif len(sys.argv) == 2:
-    web_url = sys.argv[1]
-else:
-    usage()
-
-show_number_of_pull_requests = 25
 
 NEW_LINE = '<br/>\n'
 BOLD = '<b>'
 BOLD_RESET = '</b>'
 
-subject = 'SFE-Lite Pull-Requests' + ' (last ' + str(show_number_of_pull_requests) + ' pull requests)'
+subject = job_name + ' ' + job_name2.replace('%20', ' ') + '  Pull-Requests' + ' (last ' + str(show_number_of_pull_requests) + ' pull requests)'
 body = ''
 
 print(subject)
 
 url = 'https://jenkins.rtc.dev.symphony.com/job/'
-job_name =  'SFE-Lite'
-job_name2 = 'PR-E2E'
 
 body += create_link(url + job_name + '/job/' + job_name2) + NEW_LINE
 
@@ -202,9 +214,10 @@ last_pr = get_latest_pr_number(url, job_name, job_name2)
 ### Print status of the last X pull requests
 ###
 
-nr_pass = 0
-nr_fail = 0
+nr_pass     = 0
+nr_fail     = 0
 nr_building = 0
+nr_aborted  = 0
 
 for x in range(last_pr-show_number_of_pull_requests+1, last_pr+1):
     pr_name = 'PR-' + str(x)
@@ -227,6 +240,9 @@ for x in range(last_pr-show_number_of_pull_requests+1, last_pr+1):
     elif pr_status == 'BUILDING':
         body += '   ' + pr_name + ' ' + '{:8}'.format(pr_status) + '  attempts: ' + str(number_of_attempts) + NEW_LINE
         nr_building += 1
+    elif pr_status == 'ABORTED':
+        body += '   ' + pr_name + ' ' + '{:8}'.format(pr_status) + '  attempts: ' + str(number_of_attempts) + NEW_LINE
+        nr_aborted += 1
     else:
         print('error pr_status: ' + pr_status)
 
@@ -235,11 +251,13 @@ print('body: ' + body)
 body += '-----------------------------------------' + NEW_LINE
 
 body += '   Number of failed  : ' + BOLD + str(nr_fail) + BOLD_RESET + NEW_LINE
+body += '   Number of aborted : ' + BOLD + str(nr_aborted) + BOLD_RESET + NEW_LINE
 body += '   Number of building: ' + BOLD + str(nr_building) + BOLD_RESET + NEW_LINE
 body += '   Number of pass    : ' + BOLD + str(nr_pass) + BOLD_RESET + NEW_LINE
 
 body += '-----------------------------------------' + NEW_LINE
-body += BOLD + 'TL;TR, pass-rate: ' + '{:2.1f}'.format(nr_pass/(nr_pass + nr_fail)*100) + '%' + BOLD_RESET + NEW_LINE
+if nr_pass + nr_fail != 0:
+    body += BOLD + 'TL;TR, pass-rate: ' + '{:2.1f}'.format(nr_pass/(nr_pass + nr_fail)*100) + '%' + BOLD_RESET + NEW_LINE
 
 
 send_message_to_symphony(subject, body, web_url)
