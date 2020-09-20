@@ -70,12 +70,16 @@ def print_test_case_list():
 
     test_case_duration_list = {}
 
+    smoke_test = {}
+
     for x in test_case_list:
         test_case_duration_list[x] = [test_case_list[x][0]['duration'], test_case_list[x][0]['status']]
 
         number_of_times_this_test_run = len(test_case_list[x])
         
-        # print(str(len(test_case_list[x])) + '  test_case_list[x]: ' + str(test_case_list[x]))
+        if '#smoke' in x:
+            #print(str(len(test_case_list[x])) + ' ' + x + '  test_case_list[x]: ' + str(test_case_list[x]))
+            smoke_test[x] = test_case_list[x]
 
         if number_of_times_this_test_run > 2:
             if has_status(test_case_list[x], 'FAILED'):
@@ -97,7 +101,7 @@ def print_test_case_list():
     # Sort after duration
     test_case_duration_list = sorted(test_case_duration_list.items(), key = lambda kv:(kv[1], kv[0]), reverse=True)
 
-    return [nr_of_stable_tests, flaky_test, test_case_duration_list]
+    return [nr_of_stable_tests, flaky_test, test_case_duration_list, smoke_test]
 
 
 ###
@@ -356,6 +360,24 @@ def write_test_cases_duration(path, filename, tests):
 ###
 ###
 ###
+def write_test_cases_smoke(path, filename, tests):
+    # Create directory
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    f = open(path + '/' + filename, 'w')
+
+    for x in smoke_test:
+        f.write('<b>' + x + '</b><br/>\n')
+        for q in smoke_test[x]:
+            f.write('&nbsp;&nbsp;&nbsp;build ' + str(q['build_number']) + ': ' + q['status'] + '<br/>\n')
+
+    f.close()
+
+
+###
+###
+###
 def at_least_one_build_success(build_list):
     for x in build_list:
         if build_list[x]['result'] == 'SUCCESS':
@@ -415,7 +437,7 @@ elif len(sys.argv) == 5:
 else:
     usage()
 
-show_number_of_builds = 10
+show_number_of_builds = 7
 
 
 if bot:
@@ -461,7 +483,7 @@ body += '-----------------------------------------' + NEW_LINE
 
 body += text2
 
-[nr_of_stable_tests, test_failed, test_case_duration_list] = print_test_case_list()
+[nr_of_stable_tests, test_failed, test_case_duration_list, smoke_test] = print_test_case_list()
 
 skipped_test = []
 failed_always_test = []
@@ -513,6 +535,33 @@ if test_case_duration_list:
     body += BOLD + '   Test cases duration ' + BOLD_RESET + NEW_LINE
     write_test_cases_duration(path, 'test_cases_duration.html', test_case_duration_list)
     body += '       tests: ' + create_link('http://' + my_ip_address + ':8080/' + folder_name + '/test_cases_duration.html') + NEW_LINE
+
+if smoke_test:
+    nr_of_pass_smoke_test = 0
+    nr_of_fail_smoke_test = 0
+    nr_of_skip_smoke_test = 0
+    
+    for x in smoke_test:
+        for q in smoke_test[x]:
+            if q['status'] == 'PASSED':
+                nr_of_pass_smoke_test += 1
+            elif q['status'] == 'FAILED':
+                nr_of_fail_smoke_test += 1
+            elif q['status'] == 'SKIPPED':
+                nr_of_skip_smoke_test += 1
+            else:
+                print('q[status]: ' + q['status'])
+
+    print('nr_of_pass_smoke_test: ' + str(nr_of_pass_smoke_test))
+    print('nr_of_fail_smoke_test: ' + str(nr_of_fail_smoke_test))
+    print('nr_of_skip_smoke_test: ' + str(nr_of_skip_smoke_test))
+    if nr_of_pass_smoke_test + nr_of_fail_smoke_test > 0:
+        pass_rate_smoke = nr_of_pass_smoke_test / (nr_of_pass_smoke_test + nr_of_fail_smoke_test) * 100
+    else:
+        pass_rate_smoke = 0
+    body += BOLD + '   Smoke tests (' + str(len(smoke_test)) + ') ' + str(pass_rate_smoke) + '%' + BOLD_RESET + NEW_LINE
+    write_test_cases_smoke(path, 'test_cases_smoke.html', smoke_test)
+    body += '       tests: ' + create_link('http://' + my_ip_address + ':8080/' + folder_name + '/test_cases_smoke.html') + NEW_LINE
 
 
 nr_of_flaky_tests = len(flaky_test)
