@@ -49,10 +49,18 @@ def get_jira(jira, jira_project, jql):
 
     subject_text = 'Open E2E testing bugs (' + str(len(tickets)) + ')'
 
-    body_text = ''
-    for x in tickets: 
+    body_text = '<table>'
+    for x in tickets:
+        body_text += '<tr>'
         #print('assignee: ' + str(x.fields.assignee))
-        body_text += '  ' + '{:15}'.format(str(x.fields.status)) + '{:15}'.format(str(x.fields.assignee)) + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> ' + x.fields.summary + NEW_LINE
+
+        #body_text += '  ' + '{:15}'.format(str(x.fields.status)) + '{:25}'.format(str(x.fields.assignee)) + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> ' + x.fields.summary + NEW_LINE
+        body_text += '<td>' + str(x.fields.status) + '</td>'
+        body_text += '<td>' + str(x.fields.assignee) + '</td>'
+        body_text += '<td>' + str(x) + '</td>'
+        body_text += '<td>' + x.fields.summary + '</td>'
+        body_text += '</tr>'
+    body_text += '</table>'
 
     return [subject_text, body_text]
 
