@@ -229,9 +229,11 @@ def get_build_list():
     text2 += '   Number of aborted : ' + str(nr_aborted) + NEW_LINE
     text2 += '   Number of building: ' + str(nr_building) + NEW_LINE
     text2 += '   Number of passed  : ' + str(nr_pass) + NEW_LINE
-    text2 += '   Average duration  : ' + duration_readable(total_duration/(nr_fail + nr_aborted + nr_pass)) + NEW_LINE
+    if nr_fail + nr_aborted + nr_pass != 0:
+        text2 += '   Average duration  : ' + duration_readable(total_duration/(nr_fail + nr_aborted + nr_pass)) + NEW_LINE
     text2 += '-----------------------------------------' + NEW_LINE
-    text2 += BOLD + 'TL;TR, pass-rate: ' + '{:2.1f}'.format(nr_pass/(nr_pass + nr_fail + nr_aborted)*100) + '%' + BOLD_RESET + NEW_LINE
+    if nr_pass + nr_fail + nr_aborted != 0:
+        text2 += BOLD + 'TL;TR, pass-rate: ' + '{:2.1f}'.format(nr_pass/(nr_pass + nr_fail + nr_aborted)*100) + '%' + BOLD_RESET + NEW_LINE
     text2 += '=========================================' + NEW_LINE
     return [text, text2, build_list]
 
@@ -422,8 +424,8 @@ if len(sys.argv) == 1:
     web_url = ''
     web_server_path = '/Users/johan.kwarnmark/src/web-server/'
     job_name =  'SFE-Lite'
-    job_name2 = 'Continuous-Integration-Master'
-    #job_name2 = 'Continuous-Integration-20.8'
+    #job_name2 = 'Continuous-Integration-Master'
+    job_name2 = 'Continuous-Integration-20.9'
     #job_name = 'SFE-RTC'
     #job_name2 = 'Daily%20E2E%20CI%20St2%20C2'
     #job_name2 = 'Daily%20E2E%20CI%20St2%20C1'
@@ -466,6 +468,8 @@ body += NEW_LINE
 body += create_link(url + job_name + '/job/' + job_name2) + NEW_LINE
 
 for x in range(last_build_number-show_number_of_builds+1, last_build_number+1):
+    if x < 1:
+        continue
     print('build-number: ' + str(x))
     result = get_build_status(url, job_name, job_name2, x)
 
