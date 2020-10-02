@@ -8,7 +8,7 @@ import os
 import socket
 from requests import get
 
-
+exclude_run_if_failures = 100
 
 ###
 ###
@@ -268,7 +268,7 @@ def get_build_test_report(prefix_url, job_name, job_name2, build_number):
             else:
                 print('error status: ' + status)
 
-    if (nr_fail < 50):
+    if (nr_fail < exclude_run_if_failures):
         for x in r.json()['suites']:
             for y in x['cases']:
                 class_name = y['className']
@@ -294,7 +294,7 @@ def get_build_test_report(prefix_url, job_name, job_name2, build_number):
                 else:
                     print('error status: ' + status)
     else:
-        print('MORE THAN 50 failures!!!!!')
+        print('MORE THAN ' + str(exclude_run_if_failures) + ' failures!!!!!')
         # sys.exit(5)
 
     add_build2(build_number, nr_fail, nr_pass, nr_skip)
@@ -574,7 +574,7 @@ body += NEW_LINE
 
 body += 'Extract test data from the last: ' + str(show_number_of_builds) + NEW_LINE
 body += 'Exclude runs that is aborted!' + NEW_LINE
-body += 'Exclude runs that have more than 50 failures (pod down?)' + NEW_LINE
+body += 'Exclude runs that have more than' + str(exclude_run_if_failures) + ' failures (pod down?)' + NEW_LINE
 body += '-----------------------------------------' + NEW_LINE
 body += 'Number of stable tests                   : ' + BOLD + str(nr_of_stable_tests) + BOLD_RESET + NEW_LINE
 body += 'Number of flaky tests                    : ' + BOLD + str(nr_of_flaky_tests) + BOLD_RESET + NEW_LINE
