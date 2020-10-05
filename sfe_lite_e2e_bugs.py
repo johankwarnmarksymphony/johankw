@@ -55,11 +55,11 @@ def get_jira(jira, jira_project, jql):
         #print('assignee: ' + str(x.fields.assignee))
 
         #body_text += '  ' + '{:15}'.format(str(x.fields.status)) + '{:25}'.format(str(x.fields.assignee)) + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> ' + x.fields.summary + NEW_LINE
+        body_text += '<td>' + str(x.fields.created) + '</td>'
         body_text += '<td>' + str(x.fields.priority) + '</td>'
         body_text += '<td>' + str(x.fields.status) + '</td>'
         body_text += '<td>' + str(x.fields.assignee) + '</td>'
         body_text += '<td>' + str(x) + '</td>'
-        body_text += '<td>' + str(x.fields.created) + '</td>'
         body_text += '<td>' + x.fields.summary + '</td>'
         body_text += '</tr>'
     body_text += '</table>'
