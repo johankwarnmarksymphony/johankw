@@ -84,6 +84,11 @@ def send_message_to_symphony(subject, body, webhook):
     print('r.status_code: ' + str(r.status_code))
 
 
+###
+###
+###
+def create_link(link):
+    return '<a href=\"' + link + '\" />'
 
 ####################################################
 
@@ -104,8 +109,15 @@ jira = init_jira(jira_user, jira_token)
 
 [subject_text, body_text] = get_jira(jira, 'c2', 'project = \"C2\" and labels = \"c2-e2e-test-fail\" and status != done ORDER BY created DESC')
 
+body_text += NEW_LINE
+body_text += 'Jira: ' + create_link('https://perzoinc.atlassian.net/issues/?jql=project%20%3D%20c2%20AND%20project%20%3D%20%22C2%22%20and%20labels%20%3D%20%22c2-e2e-test-fail%22%20and%20status%20!%3D%20done%20ORDER%20BY%20created%20DESC') + NEW_LINE
+
 print('subject_text: ' + subject_text)
 print('body_text: ' + body_text)
+
+
+
+
 
 if webhook:
     send_message_to_symphony(subject_text, body_text, webhook)
