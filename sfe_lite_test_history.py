@@ -22,6 +22,21 @@ def usage():
 
     sys.exit(3)
 
+
+###
+###
+###
+def get_new_code_in_pipeline(json_data):
+    if len(json_data['changeSets']) == 0:
+        return False
+
+    changes = json_data['changeSets'][0]['items']
+
+    if len(changes) == 0:
+        return False
+    else:
+        return True
+
 ###
 ###
 ###
@@ -169,18 +184,18 @@ def get_build_status(prefix_url, job_name, job_name2, build_number):
     duration_s = r.json()['duration']/1000
 
     if building:
-        add_build(build_number, 'BUILDING', '')
+        add_build(build_number, 'BUILDING', '', get_new_code_in_pipeline(r.json()))
         return 'BUILDING'
     else:
-        add_build(build_number, result, duration_s)
+        add_build(build_number, result, duration_s, get_new_code_in_pipeline(r.json()))
         return result
 
 build_list = {}
 ###
 ###
 ###
-def add_build(build_number, result, duration):
-    build_list[build_number] = {'result': result, 'duration': duration}
+def add_build(build_number, result, duration, new_code):
+    build_list[build_number] = {'result': result, 'duration': duration, 'new_code': new_code}
 
 ###
 ###
@@ -203,16 +218,21 @@ def get_build_list():
     total_duration = 0
 
     for x in build_list:
+        if build_list[x]['new_code']:
+            new_code = BOLD + '  New code' + BOLD_RESET
+        else:
+            new_code = ''
+
         if build_list[x]['duration'] == '':
-            text += '   ' + str(x) + ' ' + build_list[x]['result'] + NEW_LINE
+            text += '   ' + str(x) + ' ' + build_list[x]['result'] + new_code + NEW_LINE
         else:
             if build_list[x]['result'] == 'FAILURE':
                 if 'failed' in build_list[x]:
-                    text += '   ' + str(x) + '  ' + calculate_pass_rate(build_list[x]['failed'], build_list[x]['passed']) + '  ' + build_list[x]['result'] + '  duration: ' + duration_readable(build_list[x]['duration']) + ' (fail: ' + str(build_list[x]['failed']) + ' skip: ' + str(build_list[x]['skipped']) + ' pass: ' + str(build_list[x]['passed']) + ')' + NEW_LINE
+                    text += '   ' + str(x) + '  ' + calculate_pass_rate(build_list[x]['failed'], build_list[x]['passed']) + '  ' + build_list[x]['result'] + '  duration: ' + duration_readable(build_list[x]['duration']) + ' (fail: ' + str(build_list[x]['failed']) + ' skip: ' + str(build_list[x]['skipped']) + ' pass: ' + str(build_list[x]['passed']) + ')' + new_code + NEW_LINE
             elif build_list[x]['result'] == 'ABORTED':
-                text += '   ' + str(x) + '   0.00%' + '  ' + build_list[x]['result'] + '  duration: ' + duration_readable(build_list[x]['duration']) + NEW_LINE
+                text += '   ' + str(x) + '   0.00%' + '  ' + build_list[x]['result'] + '  duration: ' + duration_readable(build_list[x]['duration']) + new_code + NEW_LINE
             else:
-                text += '   ' + str(x) + ' 100.00%  ' + build_list[x]['result'] + '  duration: ' + duration_readable(build_list[x]['duration'])  + ' (fail: ' + str(build_list[x]['failed']) + ' skip: ' + str(build_list[x]['skipped']) + ' pass: ' + str(build_list[x]['passed']) + ')' + NEW_LINE
+                text += '   ' + str(x) + ' 100.00%  ' + build_list[x]['result'] + '  duration: ' + duration_readable(build_list[x]['duration'])  + ' (fail: ' + str(build_list[x]['failed']) + ' skip: ' + str(build_list[x]['skipped']) + ' pass: ' + str(build_list[x]['passed']) + ')' + new_code + NEW_LINE
 
             total_duration += build_list[x]['duration']
 
@@ -424,8 +444,8 @@ if len(sys.argv) == 1:
     web_url = ''
     web_server_path = '/Users/johan.kwarnmark/src/web-server/'
     job_name =  'SFE-Lite'
-    #job_name2 = 'Continuous-Integration-Master'
-    job_name2 = 'Continuous-Integration-20.9'
+    job_name2 = 'Continuous-Integration-Master'
+    #job_name2 = 'Continuous-Integration-20.9'
     #job_name = 'SFE-RTC'
     #job_name2 = 'Daily%20E2E%20CI%20St2%20C2'
     #job_name2 = 'Daily%20E2E%20CI%20St2%20C1'
