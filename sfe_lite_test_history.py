@@ -459,7 +459,7 @@ elif len(sys.argv) == 5:
 else:
     usage()
 
-show_number_of_builds = 10
+show_number_of_builds = 7
 
 
 if bot:
