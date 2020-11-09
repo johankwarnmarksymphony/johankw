@@ -168,6 +168,12 @@ if len(sys.argv) > 5:
 else:
     webhook_rtc = ''
 
+if len(sys.argv) > 6:
+    print('argv[6]: ' + sys.argv[6])
+    webhook_c2 = sys.argv[6]
+else:
+    webhook_c2 = ''
+
 jira = init_jira(sys.argv[2], sys.argv[3])
 
 if sys.argv[1] == 'daily':
@@ -183,6 +189,11 @@ if sys.argv[1] == 'daily':
         # Send for RTC
         send(3,  'rtc', webhook_rtc)
 
+        time.sleep(5)
+
+        # Send for C2
+        send(3,  'c2', webhook_c2)
+
     elif day == 1 or day == 2 or day == 3 or day == 4:
         print('Ask for 24h')
 
@@ -193,6 +204,11 @@ if sys.argv[1] == 'daily':
 
         # Send for RTC
         send(1, 'rtc', webhook_rtc)
+
+        time.sleep(5)
+
+        # Send for C2
+        send(1, 'c2', webhook_c2)
     else:
         print('Weekend')
 elif sys.argv[1] == 'weekly':
@@ -203,6 +219,11 @@ elif sys.argv[1] == 'weekly':
 
     # Send for RTC
     send(7,  'rtc', webhook_rtc)
+
+    time.sleep(5)
+
+    # Send for C2
+    send(7,  'c2', webhook_c2)
 else:
     print('Error sys.argv[1]: ' + sys.argv[1])
 
