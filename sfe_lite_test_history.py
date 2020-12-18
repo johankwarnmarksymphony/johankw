@@ -142,6 +142,8 @@ def send_message_to_symphony(subject, body, webhook):
 def get_last_build_number(prefix_url, job_name, job_name2):
     url = prefix_url + job_name + '/job/' + job_name2
 
+    print('===> get_last_build_number, url: ' + url)
+
     r = requests.get(url + '/api/json')
 
     if r.status_code != 200:
@@ -433,8 +435,8 @@ def last_two_builds_failed(build_list):
 #################################################
 
 my_ip_address = '10.245.50.27' #get('https://api.ipify.org').text
-url = 'https://jenkins.rtc.dev.symphony.com/job/'
-
+#url = 'https://jenkins.rtc.dev.symphony.com/job/'
+url = 'https://warpdrive-lab.dev.symphony.com/jenkins/job/mana/job/'
 
 
 print('my_ip_address: ' + my_ip_address)
@@ -443,8 +445,10 @@ print('my_ip_address: ' + my_ip_address)
 if len(sys.argv) == 1:
     web_url = ''
     web_server_path = '/Users/johan.kwarnmark/src/web-server/'
-    job_name =  'SFE-Lite'
-    job_name2 = 'Continuous-Integration-Master'
+    #job_name =  'SFE-Lite'
+    #job_name2 = 'Continuous-Integration-Master'
+    job_name = 'EPOD-CI-TEST'
+    job_name2 = 'EPOD-CI-MASTER'
     #job_name2 = 'Continuous-Integration-20.9'
     #job_name = 'SFE-RTC'
     #job_name2 = 'Daily%20E2E%20CI%20St2%20C2'
