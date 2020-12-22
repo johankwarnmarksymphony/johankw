@@ -24,9 +24,12 @@ def usage():
 if len(sys.argv) == 1:
     #job_name =  'SFE-Lite'
     #job_name2 = 'PR-E2E'
-    job_name = 'SFE-RTC'
+    #job_name = 'SFE-RTC'
     #job_name2 = 'PR%20IntTest%20runner%20C1'
-    job_name2 = 'PR%20IntTest%20runner%20C2'
+    #job_name2 = 'PR%20IntTest%20runner%20C2'
+
+    job_name = 'SymphonyOSF'
+    job_name2 = 'SFE-Lite'
 
     show_number_of_pull_requests = 10
 
@@ -61,7 +64,7 @@ def get_latest_pr_number(prefix_url, job_name, job_name2):
     r = requests.get(url + '/api/json')
 
     if r.status_code != 200:
-        print('get_latest_pr_number, Failed to get data')
+        print('get_latest_pr_number, Failed to get data, url: ' + url)
         sys.exit(1)
 
     biggest = 0
@@ -202,7 +205,8 @@ body = ''
 
 print(subject)
 
-url = 'https://jenkins.rtc.dev.symphony.com/job/'
+#url = 'https://jenkins.rtc.dev.symphony.com/job/'
+url = 'https://warpdrive.dev.symphony.com/jenkins/job/'
 
 body += create_link(url + job_name + '/job/' + job_name2) + NEW_LINE
 
