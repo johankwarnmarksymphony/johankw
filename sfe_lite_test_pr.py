@@ -31,7 +31,7 @@ if len(sys.argv) == 1:
     job_name = 'SymphonyOSF'
     job_name2 = 'SFE-Lite'
 
-    show_number_of_pull_requests = 10
+    show_number_of_pull_requests = 25
 
     web_url = ''
 elif len(sys.argv) == 5:
@@ -116,9 +116,15 @@ def get_number_of_attempts_pull_request(prefix_url, job_name, job_name2, pr_numb
         print('get_number_of_attempts_pull_request, Failed to get data')
         return 0
 
-    number_of_tries = r.json()['lastBuild']['number']
+    data = r.json()
 
-    return number_of_tries
+    #print('data: ' + str(data))
+
+    if data['lastBuild']:
+        number_of_tries = r.json()['lastBuild']['number']
+        return number_of_tries
+    else:
+        return 0
 
 
 ###
@@ -231,6 +237,8 @@ for x in range(last_pr-show_number_of_pull_requests+1, last_pr+1):
     number_of_attempts = get_number_of_attempts_pull_request(url, job_name, job_name2, pr_name)
 
     if number_of_attempts == 0:
+        body += '   ' + pr_name + ' ' + '{:8}'.format('FAILURE') + '  attempts: ' + str(number_of_attempts) + ' duration: ' + '0' + NEW_LINE
+        nr_fail += 1
         continue
 
     [pr_status, duration] = get_pull_request_status(url, job_name, job_name2, pr_name)
