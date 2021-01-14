@@ -175,7 +175,7 @@ def get_build_status(prefix_url, job_name, job_name2, build_number):
     r = requests.get(url + '/api/json')
 
     if r.status_code != 200:
-        print('get_last_build_number, Failed to get data')
+        print('get_build_status, Failed to get data (' + url + ')')
         sys.exit(1)
 
     # print('data: ' + json.dumps(r.json(), indent=2))
@@ -228,7 +228,7 @@ def get_build_list():
         if build_list[x]['duration'] == '':
             text += '   ' + str(x) + ' ' + build_list[x]['result'] + new_code + NEW_LINE
         else:
-            if build_list[x]['result'] == 'FAILURE':
+            if build_list[x]['result'] == 'FAILURE' or build_list[x]['result'] == 'UNSTABLE':
                 if 'failed' in build_list[x]:
                     text += '   ' + str(x) + '  ' + calculate_pass_rate(build_list[x]['failed'], build_list[x]['passed']) + '  ' + build_list[x]['result'] + '  duration: ' + duration_readable(build_list[x]['duration']) + ' (fail: ' + str(build_list[x]['failed']) + ' skip: ' + str(build_list[x]['skipped']) + ' pass: ' + str(build_list[x]['passed']) + ')' + new_code + NEW_LINE
             elif build_list[x]['result'] == 'ABORTED':
@@ -448,7 +448,8 @@ if len(sys.argv) == 1:
     #job_name =  'SFE-Lite'
     #job_name2 = 'Continuous-Integration-Master'
     job_name = 'EPOD-CI-TEST'
-    job_name2 = 'EPOD-CI-MASTER'
+    #job_name2 = 'EPOD-CI-MASTER'
+    job_name2 = 'EPOD-CI-20-12'
     #job_name2 = 'Continuous-Integration-20.9'
     #job_name = 'SFE-RTC'
     #job_name2 = 'Daily%20E2E%20CI%20St2%20C2'
@@ -463,7 +464,7 @@ elif len(sys.argv) == 5:
 else:
     usage()
 
-show_number_of_builds = 7
+show_number_of_builds = 5
 
 
 if bot:
