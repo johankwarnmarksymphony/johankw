@@ -246,7 +246,7 @@ for x in range(last_pr-show_number_of_pull_requests+1, last_pr+1):
     if pr_status == 'SUCCESS':
         body += '   ' + pr_name + ' ' + '{:8}'.format(pr_status) + '  attempts: ' + str(number_of_attempts) + ' duration: ' + duration + NEW_LINE
         nr_pass += 1
-    elif pr_status == 'FAILURE':
+    elif pr_status == 'FAILURE' or pr_status == 'UNSTABLE':
         body += '   ' + pr_name + ' ' + '{:8}'.format(pr_status) + '  attempts: ' + str(number_of_attempts) + ' duration: ' + duration + NEW_LINE
         nr_fail += 1
     elif pr_status == 'BUILDING':
