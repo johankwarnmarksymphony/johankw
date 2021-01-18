@@ -212,7 +212,7 @@ my_date = now.strftime("%Y-%m-%d %H:%M")
 
 print('my_date: ' + my_date)
 
-subject = 'SDA adaption  ' + my_date
+subject = 'SDA adoption  ' + my_date
 body += BOLD + '   SDA    : ' + get_procent(application['SDA'], total) + BOLD_RESET + '  (' + str(application['SDA']) + ')' + NEW_LINE
 body += '   Paragon: ' + get_procent(application['Paragon'], total) + '  (' + str(application['Paragon']) + ')' + NEW_LINE
 body += '   Other  : ' + get_procent(application['Other'], total) + '  (' + str(application['Other']) + ')' + NEW_LINE
