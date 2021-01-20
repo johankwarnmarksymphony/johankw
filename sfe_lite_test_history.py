@@ -32,6 +32,8 @@ def get_new_code_in_pipeline(json_data):
 
     changes = json_data['changeSets'][0]['items']
 
+    #print('get_new_code_in_pipeline, changes: ' + json.dumps(json_data, indent=2))
+
     if len(changes) == 0:
         return False
     else:
@@ -238,7 +240,7 @@ def get_build_list():
 
             total_duration += build_list[x]['duration']
 
-        if build_list[x]['result'] == 'FAILURE':
+        if build_list[x]['result'] == 'FAILURE' or build_list[x]['result'] == 'UNSTABLE':
             nr_fail += 1
         elif build_list[x]['result'] == 'BUILDING':
             nr_building += 1
@@ -448,8 +450,8 @@ if len(sys.argv) == 1:
     #job_name =  'SFE-Lite'
     #job_name2 = 'Continuous-Integration-Master'
     job_name = 'EPOD-CI-TEST'
-    #job_name2 = 'EPOD-CI-MASTER'
-    job_name2 = 'EPOD-CI-20-12'
+    job_name2 = 'EPOD-CI-MASTER'
+    #job_name2 = 'EPOD-CI-20-12'
     #job_name2 = 'Continuous-Integration-20.9'
     #job_name = 'SFE-RTC'
     #job_name2 = 'Daily%20E2E%20CI%20St2%20C2'
