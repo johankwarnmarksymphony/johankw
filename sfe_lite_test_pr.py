@@ -248,7 +248,9 @@ for x in range(last_pr-show_number_of_pull_requests+1, last_pr+1):
         nr_pass += 1
     elif pr_status == 'FAILURE' or pr_status == 'UNSTABLE':
         body += '   ' + pr_name + ' ' + '{:8}'.format(pr_status) + '  attempts: ' + str(number_of_attempts) + ' duration: ' + duration + NEW_LINE
-        nr_fail += 1
+
+        if number_of_attempts > 1:
+            nr_fail += 1
     elif pr_status == 'BUILDING':
         body += '   ' + pr_name + ' ' + '{:8}'.format(pr_status) + '  attempts: ' + str(number_of_attempts) + NEW_LINE
         nr_building += 1
@@ -261,7 +263,7 @@ for x in range(last_pr-show_number_of_pull_requests+1, last_pr+1):
 print('body: ' + body)
 
 body += '-----------------------------------------' + NEW_LINE
-
+body += 'Exclude if failure and only 1 attempt' + NEW_LINE
 body += '   Number of failed  : ' + BOLD + str(nr_fail) + BOLD_RESET + NEW_LINE
 body += '   Number of aborted : ' + BOLD + str(nr_aborted) + BOLD_RESET + NEW_LINE
 body += '   Number of building: ' + BOLD + str(nr_building) + BOLD_RESET + NEW_LINE
