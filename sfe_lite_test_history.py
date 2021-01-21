@@ -367,6 +367,21 @@ def write_test_cases(path, filename, test_cases):
 ###
 ###
 ###
+def write_failures_test_cases(path, filename, test_cases):
+    # Create directory
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    f = open(path + '/' + filename, 'w')
+
+    for x in test_cases:
+        f.write('<b>' + x + '</b><br/>\n')
+
+    f.close()
+
+###
+###
+###
 def write_test_cases_duration(path, filename, tests):
     # Create directory
     if not os.path.exists(path):
@@ -434,6 +449,25 @@ def last_two_builds_failed(build_list):
 
     return False
 
+###
+###
+###
+def extract_all_test_failed():
+    list_of_test_failed = []
+    #print('extract_all_test_failed, test_case_list: ' + json.dumps(test_case_list, indent=2))
+
+    for x in test_case_list:
+        for q in test_case_list[x]:
+            if q['status'] == 'FAILED':
+                list_of_test_failed.append(x)
+                break
+
+    return list_of_test_failed
+
+
+###
+###
+
 #################################################
 
 my_ip_address = '10.245.50.22' #get('https://api.ipify.org').text
@@ -443,8 +477,10 @@ url = 'https://warpdrive-lab.dev.symphony.com/jenkins/job/mana/job/'
 
 print('my_ip_address: ' + my_ip_address)
 
+show_number_of_builds = 5
 
 if len(sys.argv) == 1:
+    show_number_of_builds = 5
     web_url = ''
     web_server_path = '/Users/johan.kwarnmark/src/web-server/'
     #job_name =  'SFE-Lite'
@@ -466,7 +502,7 @@ elif len(sys.argv) == 5:
 else:
     usage()
 
-show_number_of_builds = 5
+
 
 
 if bot:
@@ -520,6 +556,8 @@ skipped_test = []
 failed_always_test = []
 failed_last_2 = []
 flaky_test = []
+
+list_of_test_failed = extract_all_test_failed()
 
 for x in test_failed:
 
@@ -594,6 +632,17 @@ if smoke_test:
     write_test_cases_smoke(path, 'test_cases_smoke.html', smoke_test)
     body += '       tests: ' + create_link('http://' + my_ip_address + ':8080/' + folder_name + '/test_cases_smoke.html') + NEW_LINE
 
+if list_of_test_failed:
+    body += BOLD + '   Unique test failures (' + str(len(list_of_test_failed)) +  ')' + BOLD_RESET + NEW_LINE
+    write_failures_test_cases(path, 'unique_test_failures.html', list_of_test_failed)
+    body += '       tests: ' + create_link('http://' + my_ip_address + ':8080/' + folder_name + '/unique_test_failures.html') + NEW_LINE
+
+if test_case_list:
+    body += BOLD + '   Unique tests (' + str(len(test_case_list)) +  ')' + BOLD_RESET + NEW_LINE
+    write_test_cases_smoke(path, 'unique_tests.html', list_of_test_failed)
+    body += '       tests: ' + create_link('http://' + my_ip_address + ':8080/' + folder_name + '/unique_tests.html') + NEW_LINE
+
+
 
 nr_of_flaky_tests = len(flaky_test)
 
@@ -619,4 +668,3 @@ print('bot: ' + str(bot))
 
 if bot:
     send_message_to_symphony(subject, body, web_url)
-
