@@ -382,6 +382,26 @@ def write_failures_test_cases(path, filename, test_cases):
 ###
 ###
 ###
+###
+###
+###
+def write_all_test_cases(path, filename, tests):
+    # Create directory
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    f = open(path + '/' + filename, 'w')
+
+    for x in tests:
+        f.write('<b>' + x + '</b><br/>\n')
+        for q in tests[x]:
+            f.write('&nbsp;&nbsp;&nbsp;build ' + str(q['build_number']) + ': ' + q['status'] + '<br/>\n')
+
+    f.close()
+
+###
+###
+###
 def write_test_cases_duration(path, filename, tests):
     # Create directory
     if not os.path.exists(path):
@@ -639,7 +659,7 @@ if list_of_test_failed:
 
 if test_case_list:
     body += BOLD + '   Unique tests (' + str(len(test_case_list)) +  ')' + BOLD_RESET + NEW_LINE
-    write_test_cases_smoke(path, 'unique_tests.html', list_of_test_failed)
+    write_all_test_cases(path, 'unique_tests.html', test_case_list)
     body += '       tests: ' + create_link('http://' + my_ip_address + ':8080/' + folder_name + '/unique_tests.html') + NEW_LINE
 
 
