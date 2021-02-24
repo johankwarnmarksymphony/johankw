@@ -487,6 +487,14 @@ def extract_all_test_failed():
 
 ###
 ###
+###
+def extract_all_p1_p1_test_failed(list_of_test_failed):
+    for x in list_of_test_failed:
+        if '#p1-p1' in x:
+            print('>>>> ' + x)
+
+###
+###
 
 #################################################
 
@@ -500,7 +508,7 @@ print('my_ip_address: ' + my_ip_address)
 show_number_of_builds = 5
 
 if len(sys.argv) == 1:
-    show_number_of_builds = 5
+    show_number_of_builds = 15
     web_url = ''
     web_server_path = '/Users/johan.kwarnmark/src/web-server/'
     #job_name =  'SFE-Lite'
@@ -578,6 +586,12 @@ failed_last_2 = []
 flaky_test = []
 
 list_of_test_failed = extract_all_test_failed()
+
+list_of_p1_p1_test_failed = extract_all_p1_p1_test_failed(list_of_test_failed)
+
+print('zz: ' + list_of_p1_p1_test_failed)
+
+sys.exit(5)
 
 for x in test_failed:
 

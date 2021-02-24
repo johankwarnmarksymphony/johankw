@@ -197,7 +197,7 @@ for x in rows:
         else:
             print('Application name is strange: ' + application_name)
 
-            sys.exit(5)
+            #sys.exit(5)
 
 
 

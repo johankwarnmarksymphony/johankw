@@ -31,7 +31,7 @@ if len(sys.argv) == 1:
     job_name = 'SymphonyOSF'
     job_name2 = 'SFE-Lite'
 
-    show_number_of_pull_requests = 25
+    show_number_of_pull_requests = 50
 
     web_url = ''
 elif len(sys.argv) == 5:
