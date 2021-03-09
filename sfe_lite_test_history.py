@@ -587,11 +587,11 @@ flaky_test = []
 
 list_of_test_failed = extract_all_test_failed()
 
-list_of_p1_p1_test_failed = extract_all_p1_p1_test_failed(list_of_test_failed)
+#list_of_p1_p1_test_failed = extract_all_p1_p1_test_failed(list_of_test_failed)
 
-print('zz: ' + list_of_p1_p1_test_failed)
+#print('zz: ' + list_of_p1_p1_test_failed)
 
-sys.exit(5)
+#sys.exit(5)
 
 for x in test_failed:
 
