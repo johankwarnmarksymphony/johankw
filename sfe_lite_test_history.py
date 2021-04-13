@@ -498,7 +498,7 @@ def extract_all_p1_p1_test_failed(list_of_test_failed):
 
 #################################################
 
-my_ip_address = '10.245.50.22' #get('https://api.ipify.org').text
+my_ip_address = '10.245.20.105' #get('https://api.ipify.org').text
 #url = 'https://jenkins.rtc.dev.symphony.com/job/'
 url = 'https://warpdrive-lab.dev.symphony.com/jenkins/job/mana/job/'
 
