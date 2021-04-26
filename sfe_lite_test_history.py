@@ -264,6 +264,20 @@ def get_build_list():
 ###
 ###
 ###
+def set_log_prefix(list):
+    return_string = ''
+
+    for i in reversed(list):
+        return_string += i + ' / '
+
+    return_string = return_string.replace(
+
+        ' ', '_').replace('/', '_').replace('-', '_')
+    return (return_string)
+
+###
+###
+###
 def get_build_test_report(prefix_url, job_name, job_name2, build_number):
     url = prefix_url + job_name + '/job/' + job_name2 + '/' + str(build_number) + '/testReport/'
 
@@ -294,6 +308,8 @@ def get_build_test_report(prefix_url, job_name, job_name2, build_number):
 
     if (nr_fail < exclude_run_if_failures):
         for x in r.json()['suites']:
+            log_prefix = set_log_prefix(x['enclosingBlockNames'])
+            print('log_prefix: ' + log_prefix)
             for y in x['cases']:
                 class_name = y['className']
                 name = y['name']
@@ -304,11 +320,11 @@ def get_build_test_report(prefix_url, job_name, job_name2, build_number):
                     tmp_name = name.replace('"', '_').replace(' ', '_').replace(':', '_').replace('#', '_').replace('.', '_').replace('-', '_').replace(',', '_').replace('/', '_').replace('(', '_').replace(')', '_').replace('@', '_').replace('&', '_')
                     tmp_class_name = class_name.replace(':', '_').replace('/', '_')
 
-                    test_log_url = url + '(root)/' + urllib.parse.quote(tmp_class_name + '/') + tmp_name + '/'
+                    test_log_url = url + '(root)/' + urllib.parse.quote(tmp_class_name + '/') + log_prefix + tmp_name + '/'
 
                     #print('tmp_class_name: ' + tmp_class_name)
                     #print('tmp_name: ' + tmp_name)
-                    #print('test_log_url: ' + test_log_url)
+                    print('test_log_url: ' + test_log_url)
 
                     add_test_case(class_name, name, duration, build_number, 'FAILED', test_log_url)
                 elif status == 'PASSED' or status == 'FIXED':
@@ -508,7 +524,7 @@ print('my_ip_address: ' + my_ip_address)
 show_number_of_builds = 5
 
 if len(sys.argv) == 1:
-    show_number_of_builds = 15
+    show_number_of_builds = 3
     web_url = ''
     web_server_path = '/Users/johan.kwarnmark/src/web-server/'
     #job_name =  'SFE-Lite'
