@@ -90,7 +90,9 @@ def print_test_case_list():
     smoke_test = {}
 
     for x in test_case_list:
-        test_case_duration_list[x] = [test_case_list[x][0]['duration'], test_case_list[x][0]['status']]
+        # Only put passed test in duration-list
+        if test_case_list[x][0]['status'] == 'PASSED':
+            test_case_duration_list[x] = [test_case_list[x][0]['duration'], test_case_list[x][0]['status']]
 
         number_of_times_this_test_run = len(test_case_list[x])
         
@@ -324,7 +326,7 @@ def get_build_test_report(prefix_url, job_name, job_name2, build_number):
 
                     #print('tmp_class_name: ' + tmp_class_name)
                     #print('tmp_name: ' + tmp_name)
-                    print('test_log_url: ' + test_log_url)
+                    #print('test_log_url: ' + test_log_url)
 
                     add_test_case(class_name, name, duration, build_number, 'FAILED', test_log_url)
                 elif status == 'PASSED' or status == 'FIXED':
