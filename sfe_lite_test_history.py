@@ -75,6 +75,8 @@ def has_status(list, status):
         
     return False
 
+
+
 ###
 ###
 ###
@@ -511,6 +513,20 @@ def extract_all_p1_p1_test_failed(list_of_test_failed):
         if '#p1-p1' in x:
             print('>>>> ' + x)
 
+
+###
+###
+###
+def is_regression(data):
+    # if at least 3 results
+    if len(data) < 3:
+        return False
+
+    if data[-1]['status'] == 'FAILED' and data[-2]['status'] == 'FAILED' and data[0]['status'] == 'PASSED':
+        return True
+    else:
+        return False
+
 ###
 ###
 
@@ -526,7 +542,7 @@ print('my_ip_address: ' + my_ip_address)
 show_number_of_builds = 5
 
 if len(sys.argv) == 1:
-    show_number_of_builds = 3
+    show_number_of_builds = 5
     web_url = ''
     web_server_path = '/Users/johan.kwarnmark/src/web-server/'
     #job_name =  'SFE-Lite'
@@ -602,6 +618,7 @@ skipped_test = []
 failed_always_test = []
 failed_last_2 = []
 flaky_test = []
+regression_test = []
 
 list_of_test_failed = extract_all_test_failed()
 
@@ -612,6 +629,11 @@ list_of_test_failed = extract_all_test_failed()
 #sys.exit(5)
 
 for x in test_failed:
+
+    #print('QQQQQ: ' + str(x))
+    if is_regression(x['result']):
+        print('Regression: ' + str(x['test_case']))
+        regression_test.append({'testcase': x['test_case'], 'result': x['result']})
 
     if x['result'][-1]['status'] == 'SKIPPED':
         skipped_test.append({'testcase': x['test_case'], 'result': x['result']})
@@ -631,20 +653,27 @@ for x in test_failed:
 folder_name = create_path_name()
 path = web_server_path + folder_name
 
-if skipped_test:
-    body += BOLD + '   Test skipped in the last run: ' + str(len(skipped_test)) + BOLD_RESET + NEW_LINE
-    write_test_cases(path, 'skipped_test.html', skipped_test)
-    body += '       tests: ' + create_link('http://' + my_ip_address + ':8080/' + folder_name + '/skipped_test.html') + NEW_LINE
 
 if failed_always_test:
     body += BOLD + '   Test failed 100%: ' + str(len(failed_always_test)) + BOLD_RESET + NEW_LINE
     write_test_cases(path, 'failed_always_test.html', failed_always_test)
     body += '       tests: ' + create_link('http://' + my_ip_address + ':8080/' + folder_name + '/failed_always_test.html') + NEW_LINE
 
-if failed_last_2:
-    body += BOLD + '   Test failed in the last two runs: ' + str(len(failed_last_2)) + BOLD_RESET + NEW_LINE
-    write_test_cases(path, 'failed_last_two_runs_test.html', failed_last_2)
-    body += '       tests: ' + create_link('http://' + my_ip_address + ':8080/' + folder_name + '/failed_last_two_runs_test.html') + NEW_LINE
+if regression_test:
+    body += BOLD + '   Regression tests: ' + str(len(regression_test)) + BOLD_RESET + NEW_LINE
+    write_test_cases(path, 'regression_test.html', regression_test)
+    body += '       tests: ' + create_link('http://' + my_ip_address + ':8080/' + folder_name + '/regression_test.html') + NEW_LINE
+
+
+#if failed_last_2:
+#    body += BOLD + '   Test failed in the last two runs: ' + str(len(failed_last_2)) + BOLD_RESET + NEW_LINE
+#    write_test_cases(path, 'failed_last_two_runs_test.html', failed_last_2)
+#    body += '       tests: ' + create_link('http://' + my_ip_address + ':8080/' + folder_name + '/failed_last_two_runs_test.html') + NEW_LINE
+
+if skipped_test:
+    body += BOLD + '   Test skipped in the last run: ' + str(len(skipped_test)) + BOLD_RESET + NEW_LINE
+    write_test_cases(path, 'skipped_test.html', skipped_test)
+    body += '       tests: ' + create_link('http://' + my_ip_address + ':8080/' + folder_name + '/skipped_test.html') + NEW_LINE
 
 
 if flaky_test:
@@ -656,6 +685,8 @@ if test_case_duration_list:
     body += BOLD + '   Test cases duration ' + BOLD_RESET + NEW_LINE
     write_test_cases_duration(path, 'test_cases_duration.html', test_case_duration_list)
     body += '       tests: ' + create_link('http://' + my_ip_address + ':8080/' + folder_name + '/test_cases_duration.html') + NEW_LINE
+
+
 
 if smoke_test:
     nr_of_pass_smoke_test = 0
