@@ -274,9 +274,7 @@ def set_log_prefix(list):
     for i in reversed(list):
         return_string += i + ' / '
 
-    return_string = return_string.replace(
-
-        ' ', '_').replace('/', '_').replace('-', '_')
+    return_string = return_string.replace(' ', '_').replace('/', '_').replace('-', '_').replace('[', '_').replace(']', '_')
     return (return_string)
 
 ###
@@ -321,7 +319,7 @@ def get_build_test_report(prefix_url, job_name, job_name2, build_number):
                 duration = y['duration']
 
                 if status == 'FAILED' or status == 'REGRESSION':
-                    tmp_name = name.replace('"', '_').replace(' ', '_').replace(':', '_').replace('#', '_').replace('.', '_').replace('-', '_').replace(',', '_').replace('/', '_').replace('(', '_').replace(')', '_').replace('@', '_').replace('&', '_')
+                    tmp_name = name.replace('"', '_').replace(' ', '_').replace(':', '_').replace('#', '_').replace('.', '_').replace('-', '_').replace(',', '_').replace('/', '_').replace('(', '_').replace(')', '_').replace('@', '_').replace('&', '_').replace('[', '_').replace(']', '_')
                     tmp_class_name = class_name.replace(':', '_').replace('/', '_')
 
                     test_log_url = url + '(root)/' + urllib.parse.quote(tmp_class_name + '/') + log_prefix + tmp_name + '/'
