@@ -47,7 +47,8 @@ def init_jira(user, apikey):
 ###
 ###
 def print_ticket(x):
-    summary = str(x.fields.summary).replace('\uff0e', '.') .replace('\u2019', '\'').replace('\'', '').replace('<', '')
+    summary = str(x.fields.summary).replace('\u201d', '"').replace('\u201c', '"').replace(
+        '\uff0e', '.') .replace('\u2019', '\'').replace('\'', '').replace('<', '')
 
     return '  ' + '{:15}'.format(str(x.fields.status)) + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> ' + summary + NEW_LINE
 
