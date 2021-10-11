@@ -43,7 +43,7 @@ def print_ticket(x):
     summary = str(x.fields.summary).replace('\u201d', '"').replace('\u201c', '"').replace(
         '\uff0e', '.') .replace('\u2019', '\'').replace('\'', '').replace('<', '')
 
-    return '  ' + '{:15}'.format(str(x.fields.status)) + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> ' + summary + NEW_LINE
+    return '  ' + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> ' + summary + NEW_LINE
 
 
 ###
@@ -57,14 +57,15 @@ def get_newely_fixed_bugs(jira, jira_project, hours):
     tickets = jira.search_issues(jql, maxResults=None)
 
     print('get_newely_fixed_bugs, number of fixed: ' + str(len(tickets)))
-    
+    str_body = ''
     str_fixed_tickets = ''
     for x in tickets:
         str_fixed_tickets += str(x) + ' '
+        str_body = print_ticket(x)
 
     print('str_fixed_tickets: ' + str_fixed_tickets)
     
-    return [len(tickets), str_fixed_tickets]
+    return [len(tickets), str_fixed_tickets, str_body]
 
 
 ###
@@ -131,14 +132,14 @@ else:
 
 jira = init_jira(jira_user, jira_apikey)
 
-[number_of_fixed_tickets, str_fixed_tickets] = get_newely_fixed_bugs(jira, 'c2', 1)
+[number_of_fixed_tickets, str_fixed_tickets, str_body] = get_newely_fixed_bugs(jira, 'c2', 1)
 
 if number_of_fixed_tickets != 0:
     # Send message
     print('CHIME, ' + str_fixed_tickets)
 
     subject = str_fixed_tickets
-    body = 'Fixed'
+    body = str_body
 
     send_chime(webhook)
     send_message_to_symphony(subject, body, webhook)
