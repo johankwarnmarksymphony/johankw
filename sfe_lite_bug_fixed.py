@@ -43,7 +43,9 @@ def print_ticket(x):
     summary = str(x.fields.summary).replace('\u201d', '"').replace('\u201c', '"').replace(
         '\uff0e', '.') .replace('\u2019', '\'').replace('\'', '').replace('<', '')
 
-    return '  ' + str(x.fields.assignee) + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> ' + summary + NEW_LINE
+    mention_text = '<mention email=\"' + x.fields.assignee.emailAddress + '\"/>' 
+
+    return '  ' + mention_text + ' <a href=\"https://perzoinc.atlassian.net/browse/' + str(x) + '\" /> ' + summary + NEW_LINE
 
 
 ###
@@ -62,6 +64,9 @@ def get_newely_fixed_bugs(jira, jira_project, hours):
     for x in tickets:
         str_fixed_tickets += str(x) + ' '
         str_body += print_ticket(x)
+
+    str_body += ':hearts:' + NEW_LINE
+    str_body += 'Powered by: JohanKw' + NEW_LINE
 
     print('str_fixed_tickets: ' + str_fixed_tickets)
     
