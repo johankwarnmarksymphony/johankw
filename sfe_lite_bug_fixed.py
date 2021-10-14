@@ -41,7 +41,7 @@ def init_jira(user, apikey):
 ###
 def print_ticket(x):
     summary = str(x.fields.summary).replace('\u201d', '"').replace('\u201c', '"').replace(
-        '\uff0e', '.') .replace('\u2019', '\'').replace('\'', '').replace('<', '')
+        '\uff0e', '.') .replace('\u2019', '\'').replace('\'', '')
 
     mention_text = '<mention email=\"' + x.fields.assignee.emailAddress + '\"/>' 
 
