@@ -159,6 +159,7 @@ application['Paragon'] = 0
 application['Other']   = 0
 
 sda_version = {}
+sda_version['14.x'] = 0
 sda_version['9.x'] = 0
 sda_version['6.x'] = 0
 sda_version['3.x'] = 0
@@ -189,6 +190,8 @@ for x in rows:
                 sda_version['6.x'] += number_of_times
             elif application_version.startswith('9.'):
                 sda_version['9.x'] += number_of_times
+            elif application_version.startswith('14.'):
+                sda_version['14.x'] += number_of_times
 
         elif application_name == 'Paragon':
             application['Paragon'] += number_of_times
@@ -224,6 +227,8 @@ total = sda_version['3.x'] + sda_version['6.x'] + sda_version['9.x']
 body += '   SDA 3.x : ' + get_procent(sda_version['3.x'], total) + '  (' + str(sda_version['3.x']) + ')' + NEW_LINE
 body += '   SDA 6.x : ' + get_procent(sda_version['6.x'], total) + '  (' + str(sda_version['6.x']) + ')' + NEW_LINE
 body += BOLD + '   SDA 9.x : ' + get_procent(sda_version['9.x'], total) + BOLD_RESET + '  (' + str(sda_version['9.x']) + ')' + NEW_LINE
+body += '   SDA 14.x : ' + get_procent(sda_version['14.x'], total) + '  (' + str(sda_version['14.x']) + ')' + NEW_LINE
+
 body += '-----------------------' + NEW_LINE
 
 
@@ -232,6 +237,3 @@ body += '   Domo: ' + create_link('https://symphony.domo.com/page/132442628/kpis
 print('body: ' + body)
 
 send_message_to_symphony(subject, body, web_url)
-
-# Bold
-# links
