@@ -51,8 +51,8 @@ def print_ticket(x):
 ###
 ###
 ###
-def get_newely_fixed_bugs(jira, jira_project, hours):
-    jql = 'project = ' + jira_project + ' AND type = bug and status = done and resolution = Fixed and resolutiondate >= -' + str(hours) + 'h ORDER BY created DESC'
+def get_newely_fixed_bugs(jira, jira_project, minutes):
+    jql = 'project = ' + jira_project + ' AND type = bug and status = done and resolution = Fixed and resolutiondate >= -' + str(minutes) + 'm ORDER BY created DESC'
 
     print('====> JQL: ' + jql)
 
@@ -124,11 +124,18 @@ print('beginning of sfe_lite_bug_fixed.oy')
 
 print('argc: ' + str(len(sys.argv)))
 
-if len(sys.argv) == 4:
+if len(sys.argv) == 5:
+    minutes = sys.argv[1]
+    jira_user = sys.argv[2]
+    jira_apikey = sys.argv[3]
+    webhook = sys.argv[4]
 
-    jira_user = sys.argv[1]
-    jira_apikey = sys.argv[2]
-    webhook = sys.argv[3]
+    print('  jira_user: ' + jira_user)
+elif len(sys.argv) == 4:
+    minutes = sys.argv[1]
+    jira_user = sys.argv[2]
+    jira_apikey = sys.argv[3]
+    webhook = ''
 
     print('  jira_user: ' + jira_user)
 else:
@@ -137,7 +144,7 @@ else:
 
 jira = init_jira(jira_user, jira_apikey)
 
-[number_of_fixed_tickets, str_fixed_tickets, str_body] = get_newely_fixed_bugs(jira, 'c2', 1)
+[number_of_fixed_tickets, str_fixed_tickets, str_body] = get_newely_fixed_bugs(jira, 'c2', minutes)
 
 if number_of_fixed_tickets != 0:
     # Send message
